@@ -13,16 +13,15 @@ void stream_memzero(struct fml_stream *stream)
 	memset(stream, 0, sizeof(*stream));
 }
 
-struct fml_stream fml_stream_open(void *data, size_t data_size)
+struct fml_stream fml_stream_open(char *data, size_t data_size)
 {
 	struct fml_stream stream;
+	stream_memzero(&stream);
 
 	if (data == NULL || data_size == 0) {
-		stream_memzero(&stream);
 		return stream;
 	}
 
-	stream_memzero(&stream);
 	stream.data = data;
 	stream.data_size = data_size;
 	stream.index = 0;
@@ -36,10 +35,10 @@ void fml_stream_close(struct fml_stream *stream)
 	stream_memzero(stream);
 }
 
-inline int peek_char(struct fml_stream *stream)
+inline int peek_char(struct fml_stream *stream, size_t offset)
 {
-	if (stream->index < stream->data_size)
-		return stream->data[stream->index];
+	if (stream->index + offset < stream->data_size)
+		return stream->data[stream->index + offset];
 	else
 		return -1;
 }
@@ -54,7 +53,8 @@ struct fml_token get_error_token(const char *message, size_t file_offset)
 	struct fml_token token;
 	token.type = FML_TOKEN_ERROR;
 	token.value = message;
-	token.file_offset = file_offset;
+	token.value_size = strlen(message);
+	token.offset = file_offset;
 	return token;
 }
 
@@ -71,7 +71,7 @@ char translate_escape_code(char code)
 }
 
 void skip_to_next_line(struct fml_stream *stream);
-char *parse_word_item(struct fml_stream *stream);
+void parse_word_item(struct fml_stream *stream, struct fml_token *token);
 
 struct fml_token fml_stream_pop(struct fml_stream *stream)
 {
@@ -81,25 +81,31 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 
 	struct fml_token token;
 	token.value = NULL;
-	token.file_offset = stream->index;
+	token.value_size = 0;
 
 	for (;;) {
-		int ch = peek_char(stream);
-		next_char(stream);
+		int ch = peek_char(stream, 0);
 
 		if (isspace(ch)) {
+			next_char(stream);
 			continue;
 		}
-		else if (ch == '[') {
+
+		token.offset = stream->index;
+
+		if (ch == '[') {
+			next_char(stream);
 			token.type = FML_TOKEN_OPEN;
 			return token;
 		}
 		else if (ch == ']') {
+			next_char(stream);
 			token.type = FML_TOKEN_CLOSE;
 			return token;
 		}
 		else if (ch == '|') {
-			if (peek_char(stream) == '|') {
+			next_char(stream);
+			if (peek_char(stream, 0) == '|') {
 				skip_to_next_line(stream);
 				continue;
 			}
@@ -113,8 +119,7 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 			return token;
 		}
 		else {
-			token.value = parse_word_item(stream);
-			token.type = FML_TOKEN_ITEM;
+			parse_word_item(stream, &token);
 			return token;
 		}
 	}
@@ -125,7 +130,7 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 void skip_to_next_line(struct fml_stream *stream)
 {
 	for (;;) {
-		int ch = peek_char(stream);
+		int ch = peek_char(stream, 0);
 		next_char(stream);
 
 		if (ch == '\n' || ch == '\r' || ch == -1)
@@ -133,38 +138,38 @@ void skip_to_next_line(struct fml_stream *stream)
 	}
 }
 
-char *parse_word_item(struct fml_stream *stream)
+void parse_word_item(struct fml_stream *stream, struct fml_token *token)
 {
 	char *word_start = &stream->data[stream->index];
 	char *p = word_start;
 	bool shift_necessary = false;
 
 	// scan the word, collapsing escape codes in-place if necessary
-	int ch = peek_char(stream);
+	int ch = peek_char(stream, 0);
 	while (!isspace(ch) && ch != -1 && ch != '|' && ch != '[' && ch != ']') {
 		if (ch == '\\') {
 			// substitute 2-character escape code with the character it represents
 			next_char(stream);
-			ch = peek_char(stream);
+			ch = peek_char(stream, 0);
 			if (ch == -1) break;
 			*p = translate_escape_code(ch);
 			shift_necessary = true;
 		}
 		else if (shift_necessary) {
-			// shift regular character
-			*p = (ch = peek_char(stream));
+			// shift character to the left collapsed position
+			*p = (ch = peek_char(stream, 0));
 		}
 
+		// go on to the next potential character
 		p++;
 		next_char(stream);
-		ch = peek_char(stream);
+		ch = peek_char(stream, 0);
 	}
 
-	// null-terminate the resulting string in-place
-	*p = '\0';
-
-	// return a reference to the data, because we assume the original data
-	return word_start;
+	// return a reference to the data slice
+	token->type = FML_TOKEN_ITEM;
+	token->value = word_start;
+	token->value_size = (p - word_start);
 }
 
 
