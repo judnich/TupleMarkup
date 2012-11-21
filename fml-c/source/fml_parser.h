@@ -1,3 +1,6 @@
+// Copyright (C) 2012 John Judnich
+// Released as open-source under The MIT Licence.
+
 // This parser runs entirely in-place with no heap allocations whatosever.
 // A memory buffer is given to the parser. The parser then reads through it on demand
 // and may modify it (e.g. collapsing escape codes). Returned tokens reference memory

@@ -1,3 +1,6 @@
+// Copyright (C) 2012 John Judnich
+// Released as open-source under The MIT Licence.
+
 #include "fml_parser.h"
 
 #include <stdio.h>
