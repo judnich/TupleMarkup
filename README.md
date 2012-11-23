@@ -35,17 +35,6 @@ The bar "|" delimiter creates a nested tuple out of each section it separates. F
 
 Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[ | ]" is equivalent to "[ [] [] ]". 
 
-###Nonsingleton Nesting Delimiter
-
-The "~" delimiter creates nested tuples for each section only if the section contains more than one item:
-
-    [ position ~ 1 2 3 ]
-
-...is equivalent to the following (note how the left section, containing only one item "position", is not nested into its own tuple):
-
-    [ position [1 2 3] ]
-
-This is quite useful for writing name-value pairs, for example.
 
 ###Comments
 
@@ -63,17 +52,9 @@ That's it! You now know all of TML. Take a look at the examples below to see how
 ###A simple TML example:
 
     [
-        [position [1 2 3]]
-        [color blue]
-        [scale [0.5 0.3]]
-    ]
-
-An equivalent TML code:
-
-    [
-    	[position ~ 1 2 3]
-    	[color ~ blue]
-    	[scale ~ 0.5 0.3]
+        [position | 0.1 0.2]
+        [color | blue]
+        [scale | 0.5 0.3]
     ]
 
 
@@ -97,23 +78,23 @@ Compare to HTML/XML:
 ###TML example demonstrating key-value pair semantics:
 
     [
-    	[firstName ~ John]
-    	[lastName ~ Smith]
-    	[age ~ 25]
-    	[address ~
-    		[streetAddress ~ 21 2nd Street]
-    		[city ~ New York]
-    		[state ~ NY]
-    		[postalCode ~ 10021]
+    	[firstName | John]
+    	[lastName | Smith]
+    	[age | 25]
+    	[address |
+    		[streetAddress | 21 2nd Street]
+    		[city | New York]
+    		[state | NY]
+    		[postalCode | 10021]
     	]
-    	[phoneNumber ~
+    	[phoneNumber |
     		[
-    			[type ~ home]
-    			[number ~ 212 555-1234]
+    			[type | home]
+    			[number | 212 555-1234]
     		]
     		[
-    			[type ~ fax]
-    			[number ~ 646 555-4567]
+    			[type | fax]
+    			[number | 646 555-4567]
     		]
     	]
     ]
