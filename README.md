@@ -17,11 +17,9 @@ This is an example of a tuple of four items (a "4-tuple"):
 
 You can nest tuples and data arbitrarily, for example:
 
-    [ [a b c] 1 2 3 [[x][y]] ]
+    [ [blah blah] 1 2 3 [[x][y]] ]
 
-Writing empty tuples is also valid: "[]". 
-
-Nesting tuples of tuples is a common case, so we provide two forms of special syntax for this.
+Writing empty tuples is also valid: "[]". Nesting tuples of tuples is a common case, so we provide two forms of special syntax for this.
 
 ###Nesting Delimiter
 
@@ -38,9 +36,9 @@ Empty tuples will also be generated with the "|" delimiter if you delimit nothin
 
 ###Comments
 
-Line comments are supported. Simply prefix the comment with "~~". For example:
+Line comments are supported. Simply prefix the comment with "||". For example:
 
-    ~~ This is a line comment example.
+    || This is a line comment example.
 
 ###Done.
 
@@ -51,7 +49,7 @@ That's it! You now know all of TML. Take a look at the examples below to see how
 
 ###A simple TML example:
 
-    [
+    [ spaceship A |
         [position | 0.1 0.2]
         [color | blue]
         [scale | 0.5 0.3]
