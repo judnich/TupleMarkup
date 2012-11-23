@@ -42,10 +42,10 @@ Line comments are supported. Simply prefix the comment with "~~". For example:
 That's it! You now know 100% of TML.
 
 
-Examples:
+Examples
 ----
 
-TML example:
+A simple TML example:
 
     [
         [position [1 2 3]]
@@ -53,7 +53,7 @@ TML example:
         [scale [0.5 0.3]]
     ]
 
-Equivalent TML example:
+An equivalent TML code:
 
     [
     	[position ~ 1 2 3]
@@ -62,7 +62,7 @@ Equivalent TML example:
     ]
 
 
-TML example:
+TML example demonstrating markup semantics:
 
     [html |
     	Hello. This is an example [b|language] test.
@@ -79,7 +79,7 @@ Compare to HTML/XML:
     </html>
 
 
-TML example:
+TML example demonstrating key-value pair semantics:
 
     [
     	[firstName ~ John]
