@@ -48,16 +48,6 @@ inline void next_char(struct fml_stream *stream)
 	stream->index++;
 }
 
-struct fml_token get_error_token(const char *message, size_t file_offset)
-{
-	struct fml_token token;
-	token.type = FML_TOKEN_ERROR;
-	token.value = message;
-	token.value_size = strlen(message);
-	token.offset = file_offset;
-	return token;
-}
-
 char translate_escape_code(char code)
 {
 	switch (code) {
@@ -70,15 +60,12 @@ char translate_escape_code(char code)
 	}
 }
 
+struct fml_token parse_token(struct fml_stream *stream);
 void skip_to_next_line(struct fml_stream *stream);
 void parse_word_item(struct fml_stream *stream, struct fml_token *token);
 
 struct fml_token fml_stream_pop(struct fml_stream *stream)
 {
-	if (stream->data == NULL || stream->data_size == 0) {
-		return get_error_token("Invalid FML stream (no data)", 0);
-	}
-
 	struct fml_token token;
 	token.value = NULL;
 	token.value_size = 0;
@@ -123,8 +110,6 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 			return token;
 		}
 	}
-
-	return get_error_token("Internal parser error", stream->index);
 }
 
 void skip_to_next_line(struct fml_stream *stream)

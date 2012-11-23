@@ -27,7 +27,7 @@ void destroy_stream(struct fml_stream *stream)
 	free(data);
 }
 
-static const char *fml_token_type_strings[] = { " ||ERROR", " ||EOF", "[", "]", "|", "" };
+static const char *fml_token_type_strings[] = { " ||EOF", "[", "]", "|", "" };
 
 void print_token(char *dest, struct fml_token token)
 {
@@ -55,7 +55,7 @@ void print_stream(char *dest, struct fml_stream *stream)
 
 	token = fml_stream_pop(stream);
 
-	while (token.type != FML_TOKEN_EOF && token.type != FML_TOKEN_ERROR) {
+	while (token.type != FML_TOKEN_EOF) {
 		print_token(dest, token);
 		token = fml_stream_pop(stream);
 	}
@@ -81,7 +81,7 @@ int parse_and_redisplay_test(char *str_to_parse, char *str_to_verify)
 void test_assert(int i, int r)
 {
 	printf("#%d ", i);
-	if (r < 0) printf("FAIL\n");
+	if (r != 0) printf("FAIL\n");
 	else printf("PASS\n");
 }
 
@@ -89,11 +89,11 @@ void test_assert(int i, int r)
 int main(void)
 {
 	test_assert( 1, 
-		parse_and_redisplay_test("[ [a] || this is a comment\n b c |\n 1 2 3 ]", "[[a ]b c |1 2 3 ] ||EOF") 
+		parse_and_redisplay_test("[ [a|] || this is a comment\n b c |\n 1 2 3 ]", "[[a |]b c |1 2 3 ] ||EOF") 
 	);
 
 	test_assert( 2, 
-		parse_and_redisplay_test("[[[[[!@#]]]]]", "[[[[[!@# ]]]]] ||EOF") 
+		parse_and_redisplay_test("[|[|[|[|[|!@#]]]]]", "[|[|[|[|[|!@# ]]]]] ||EOF") 
 	);
 
 	test_assert( 3, 
@@ -102,6 +102,30 @@ int main(void)
 
 	test_assert( 4, 
 		parse_and_redisplay_test("[left stuff|]", "[left stuff |] ||EOF") 
+	);
+
+	test_assert( 5, 
+		parse_and_redisplay_test("[a b c|1 2 3]", "[a b c |1 2 3 ] ||EOF") 
+	);
+
+	test_assert( 6, 
+		parse_and_redisplay_test("[[", "[[ ||EOF") 
+	);
+
+	test_assert( 7, 
+		parse_and_redisplay_test("[hello", "[hello  ||EOF") 
+	);
+
+	test_assert( 8, 
+		parse_and_redisplay_test("\\\\", "\\  ||EOF") 
+	);
+
+	test_assert( 9, 
+		parse_and_redisplay_test("\\", "  ||EOF") 
+	);
+
+	test_assert( 10, 
+		parse_and_redisplay_test("[  ]", "[] ||EOF") 
 	);
 
 	return 0;
