@@ -1,3 +1,4 @@
-[|] Falcon Markup Language
+[|] Tuple Markup Language
 
-A generic markup language with fundamental simplicity at the core of its design.
+An extremely simple all-purpose markup language: nested lists with syntax that alleviates "bracket overload".
+
