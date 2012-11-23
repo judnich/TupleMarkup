@@ -1,11 +1,15 @@
-Tuple Markup Language
-====
+#Tuple Markup Language
 
 An extremely simple all-purpose markup language: nested lists with syntax that alleviates "bracket overload".
 It enables JSON-like and XML-like semantics within the same clean and consistent language, plus much more.
 
-TML Syntax
-----
+### What is in this repository?
+
+This repo contains TML parsers and query APIs implemented in a variety of languages. These allow your applications to quickly and easily access data from TML files. Refer to a TML parser implementation folder for documentation on how to get started using TML files in your application language of choice.
+
+##TML Syntax
+
+###Basic Tuples
 
 This is an example of a tuple of four items (a "4-tuple"):
 
@@ -15,7 +19,11 @@ You can nest tuples and data arbitrarily:
 
     [[a 1] c d [[a b c] [1 2 3]]]
 
+Writing empty tuples is also valid: "[]". 
+
 Nesting tuples of tuples is a common case, so we provide two forms of special syntax for this.
+
+###Nesting Delimiters
 
 The bar "|" delimiter creates a nested tuple out of each section it separates. For example:
 
@@ -25,27 +33,30 @@ is equivalent to
 
     [ [a b c] [1 2 3] [x] [y] [z] ]
 
+Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[|]" is equivalent to "[[][]]". 
+
 The "~" list delimiter creates nested tuples for each section only if the section contains more than one item:
 
     [ a b c ~ 1 2 3 ~ x ~ y ~ z ]
 
-is equivalent to the following (note how the last three delimited sections are not tuple-ized):
+is equivalent to the following (note how the last three delimited sections are not made into 1-tuples):
 
     [ [a b c] [1 2 3] x y z ]
 
-You can also write empty tuples if you wish: "[]". Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[|]" is equivalent to "[[][]]". 
+###Comments
 
 Line comments are supported. Simply prefix the comment with "~~". For example:
 
     ~~ This is a line comment example.
 
-That's it! You now know 100% of TML.
+###Done.
+
+That's it! You now know all of TML. Take a look at the examples below to see how it looks in use.
 
 
-Examples
-----
+##Examples
 
-A simple TML example:
+###A simple TML example:
 
     [
         [position [1 2 3]]
@@ -62,7 +73,7 @@ An equivalent TML code:
     ]
 
 
-TML example demonstrating markup semantics:
+###TML example demonstrating markup semantics:
 
     [html |
     	Hello. This is an example [b|language] test.
@@ -79,7 +90,7 @@ Compare to HTML/XML:
     </html>
 
 
-TML example demonstrating key-value pair semantics:
+###TML example demonstrating key-value pair semantics:
 
     [
     	[firstName ~ John]
