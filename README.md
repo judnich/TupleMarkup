@@ -48,9 +48,9 @@ Examples:
 TML example:
 
     [
-      [position [1 2 3]]
-    	[color blue]
-    	[scale [0.5 0.3]]
+        [position [1 2 3]]
+        [color blue]
+        [scale [0.5 0.3]]
     ]
 
 Equivalent TML example:
