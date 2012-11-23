@@ -15,33 +15,37 @@ This is an example of a tuple of four items (a "4-tuple"):
 
     [a b c d]
 
-You can nest tuples and data arbitrarily:
+You can nest tuples and data arbitrarily, for example:
 
-    [[a 1] c d [[a b c] [1 2 3]]]
+    [ [a b c] 1 2 3 [[x][y]] ]
 
 Writing empty tuples is also valid: "[]". 
 
 Nesting tuples of tuples is a common case, so we provide two forms of special syntax for this.
 
-###Nesting Delimiters
+###Nesting Delimiter
 
 The bar "|" delimiter creates a nested tuple out of each section it separates. For example:
 
-    [ a b c | 1 2 3 | x | y | z ]
+    [ position | 1 2 3 ]
 
-is equivalent to
+...is equivalent to:
 
-    [ [a b c] [1 2 3] [x] [y] [z] ]
+    [ [position] [1 2 3] ]
 
-Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[|]" is equivalent to "[[][]]". 
+Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[ | ]" is equivalent to "[ [] [] ]". 
 
-The "~" list delimiter creates nested tuples for each section only if the section contains more than one item:
+###Nonsingleton Nesting Delimiter
 
-    [ a b c ~ 1 2 3 ~ x ~ y ~ z ]
+The "~" delimiter creates nested tuples for each section only if the section contains more than one item:
 
-is equivalent to the following (note how the last three delimited sections are not made into 1-tuples):
+    [ position ~ 1 2 3 ]
 
-    [ [a b c] [1 2 3] x y z ]
+...is equivalent to the following (note how the left section, containing only one item "position", is not nested into its own tuple):
+
+    [ position [1 2 3] ]
+
+This is quite useful for uncluttered name-value pairs, for example.
 
 ###Comments
 
