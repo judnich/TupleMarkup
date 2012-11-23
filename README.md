@@ -1,4 +1,4 @@
-[|] Tuple Markup Language
+Tuple Markup Language
 ====
 
 An extremely simple all-purpose markup language: nested lists with syntax that alleviates "bracket overload".
@@ -11,15 +11,11 @@ This is an example of a tuple of four items (a "4-tuple"):
 
     [a b c d]
 
-You can nest tuples and data arbitrarily. This is a 3-tuple containing a 2-tuple and two items:
+You can nest tuples and data arbitrarily:
 
-    [[a 1] c d]
+    [[a 1] c d [[a b c] [1 2 3]]]
 
-Another example of nested tuples:
-
-    [[a b c] [1 2 3]]
-
-Nesting tuples of tuples like this is a common case, so we provide two forms of special syntax for this.
+Nesting tuples of tuples is a common case, so we provide two forms of special syntax for this.
 
 The bar "|" delimiter creates a nested tuple out of each section it separates. For example:
 
@@ -33,13 +29,15 @@ The "~" list delimiter creates nested tuples for each section only if the sectio
 
     [ a b c ~ 1 2 3 ~ x ~ y ~ z ]
 
-is equivalent to:
+is equivalent to the following (note how the last three delimited sections are not tuple-ized):
 
     [ [a b c] [1 2 3] x y z ]
 
-Note how with "~" the last three delimited sections containing only one item were not list-ized.
+You can also write empty tuples if you wish: "[]". Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[|]" is equivalent to "[[][]]". 
 
-You can also write empty tuples if you wish: "[]". Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[|]" is equivalent to "[[][]]".
+Line comments are supported. Simply prefix the comment with "~~". For example:
+
+    ~~ This is a line comment example.
 
 That's it! You now know 100% of TML.
 
