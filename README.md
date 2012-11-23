@@ -45,7 +45,7 @@ The "~" delimiter creates nested tuples for each section only if the section con
 
     [ position [1 2 3] ]
 
-This is quite useful for uncluttered name-value pairs, for example.
+This is quite useful for writing name-value pairs, for example.
 
 ###Comments
 
