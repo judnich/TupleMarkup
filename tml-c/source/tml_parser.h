@@ -8,35 +8,35 @@
 // and may modify it (e.g. collapsing escape codes). Returned tokens reference memory
 // within the original buffer, as no copying occurs. You retain allocation ownership 
 // of the data though the parser may modify it in the process of parsing it. Free
-// it yourself when you're done however you like. This way, you can close an fml_stream 
+// it yourself when you're done however you like. This way, you can close an tml_stream 
 // without invalidating any token values extracted from it.
 
 #include <ctype.h>
 
-struct fml_stream
+struct tml_stream
 {
 	char *data;
 	size_t data_size;
 	size_t index;
 };
 
-enum FML_TOKEN_TYPE
+enum TML_TOKEN_TYPE
 {
-	FML_TOKEN_EOF, FML_TOKEN_OPEN, FML_TOKEN_CLOSE, FML_TOKEN_DIVIDER, FML_TOKEN_ITEM
+	TML_TOKEN_EOF, TML_TOKEN_OPEN, TML_TOKEN_CLOSE, TML_TOKEN_DIVIDER, TML_TOKEN_ITEM
 };
 
-struct fml_token
+struct tml_token
 {
-	enum FML_TOKEN_TYPE type;
+	enum TML_TOKEN_TYPE type;
 	const char *value;
 	size_t value_size;
 	size_t offset;
 };
 
-struct fml_stream fml_stream_open(char *data, size_t data_size);
-void fml_stream_close(struct fml_stream *stream);
+struct tml_stream tml_stream_open(char *data, size_t data_size);
+void tml_stream_close(struct tml_stream *stream);
 
-struct fml_token fml_stream_pop(struct fml_stream *stream);
+struct tml_token tml_stream_pop(struct tml_stream *stream);
 
 
 

@@ -1,21 +1,21 @@
 // Copyright (C) 2012 John Judnich
 // Released as open-source under The MIT Licence.
 
-#include "fml_parser.h"
+#include "tml_parser.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
 
-void stream_memzero(struct fml_stream *stream)
+void stream_memzero(struct tml_stream *stream)
 {
 	memset(stream, 0, sizeof(*stream));
 }
 
-struct fml_stream fml_stream_open(char *data, size_t data_size)
+struct tml_stream tml_stream_open(char *data, size_t data_size)
 {
-	struct fml_stream stream;
+	struct tml_stream stream;
 	stream_memzero(&stream);
 
 	if (data == NULL || data_size == 0) {
@@ -29,13 +29,13 @@ struct fml_stream fml_stream_open(char *data, size_t data_size)
 	return stream;
 }
 
-void fml_stream_close(struct fml_stream *stream)
+void tml_stream_close(struct tml_stream *stream)
 {
 	if (!stream) return;
 	stream_memzero(stream);
 }
 
-inline int peek_char(struct fml_stream *stream, size_t offset)
+inline int peek_char(struct tml_stream *stream, size_t offset)
 {
 	if (stream->index + offset < stream->data_size)
 		return stream->data[stream->index + offset];
@@ -43,7 +43,7 @@ inline int peek_char(struct fml_stream *stream, size_t offset)
 		return -1;
 }
 
-inline void next_char(struct fml_stream *stream)
+inline void next_char(struct tml_stream *stream)
 {
 	stream->index++;
 }
@@ -60,13 +60,13 @@ char translate_escape_code(char code)
 	}
 }
 
-struct fml_token parse_token(struct fml_stream *stream);
-void skip_to_next_line(struct fml_stream *stream);
-void parse_word_item(struct fml_stream *stream, struct fml_token *token);
+struct tml_token parse_token(struct tml_stream *stream);
+void skip_to_next_line(struct tml_stream *stream);
+void parse_word_item(struct tml_stream *stream, struct tml_token *token);
 
-struct fml_token fml_stream_pop(struct fml_stream *stream)
+struct tml_token tml_stream_pop(struct tml_stream *stream)
 {
-	struct fml_token token;
+	struct tml_token token;
 	token.value = NULL;
 	token.value_size = 0;
 
@@ -82,12 +82,12 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 
 		if (ch == '[') {
 			next_char(stream);
-			token.type = FML_TOKEN_OPEN;
+			token.type = TML_TOKEN_OPEN;
 			return token;
 		}
 		else if (ch == ']') {
 			next_char(stream);
-			token.type = FML_TOKEN_CLOSE;
+			token.type = TML_TOKEN_CLOSE;
 			return token;
 		}
 		else if (ch == '|') {
@@ -97,12 +97,12 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 				continue;
 			}
 			else {
-				token.type = FML_TOKEN_DIVIDER;
+				token.type = TML_TOKEN_DIVIDER;
 				return token;
 			}
 		}
 		else if (ch == -1) {
-			token.type = FML_TOKEN_EOF;
+			token.type = TML_TOKEN_EOF;
 			return token;
 		}
 		else {
@@ -112,7 +112,7 @@ struct fml_token fml_stream_pop(struct fml_stream *stream)
 	}
 }
 
-void skip_to_next_line(struct fml_stream *stream)
+void skip_to_next_line(struct tml_stream *stream)
 {
 	for (;;) {
 		int ch = peek_char(stream, 0);
@@ -123,7 +123,7 @@ void skip_to_next_line(struct fml_stream *stream)
 	}
 }
 
-void parse_word_item(struct fml_stream *stream, struct fml_token *token)
+void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 {
 	char *word_start = &stream->data[stream->index];
 	char *p = word_start;
@@ -152,7 +152,7 @@ void parse_word_item(struct fml_stream *stream, struct fml_token *token)
 	}
 
 	// return a reference to the data slice
-	token->type = FML_TOKEN_ITEM;
+	token->type = TML_TOKEN_ITEM;
 	token->value = word_start;
 	token->value_size = (p - word_start);
 }
