@@ -3,6 +3,8 @@
 An extremely simple all-purpose markup language: nested lists with syntax that alleviates "bracket overload".
 It enables JSON-like and XML-like semantics within the same clean and consistent language, plus much more.
 
+**NOTE:** _This project is very much a work-in-progress at the moment. While the language spec is mostly done, it still needs parser and read/write API implementations in as many languages as possible. Implementations in C, Javascript, and possibly Mozilla Rust, Google Go, and C++ are planned for the "official" release._
+
 ### What is in this repository?
 
 This repo contains TML parsers and query APIs implemented in a variety of languages. These allow your applications to quickly and easily access data from TML files. Refer to a TML parser implementation folder for examples and documentation on using TML data in your application.
@@ -27,7 +29,7 @@ The bar "|" delimiter creates a nested tuple out of each section it separates. F
 
     [ position | 1 2 3 ]
 
-...is equivalent to:
+is equivalent to:
 
     [ [position] [1 2 3] ]
 
@@ -39,6 +41,16 @@ Empty tuples will also be generated with the "|" delimiter if you delimit nothin
 Line comments are supported. Simply prefix the comment with "||". For example:
 
     || This is a line comment example.
+
+###Escape Codes
+
+For special characters, you may use "\" for escape codes much like in C. Escape codes supported are:
+
+    \n \r \t \s \\ \[ \] \| \? \*
+
+These respectively evaluate to: newline code, return code, tab code, space, \, [, ], |, code 0x01, code 0x02.
+
+The last two, "\?" and "\*", are escape codes meant to be used as wildcard tokens by some TML APIs that allow you to use pattern-matching search queries on a TML tree (refer to the TML APIs documentation for more info). They don't have any unusual syntactic behavior.
 
 ###Done.
 
