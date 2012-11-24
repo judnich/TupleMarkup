@@ -1,5 +1,7 @@
-// Copyright (C) 2012 John Judnich
-// Released as open-source under The MIT Licence.
+/* 
+ * Copyright (C) 2012 John Judnich
+ * Released as open-source under The MIT Licence. 
+ */
 
 #include "tml_parser.h"
 
@@ -35,7 +37,7 @@ void tml_stream_close(struct tml_stream *stream)
 	stream_memzero(stream);
 }
 
-inline int peek_char(struct tml_stream *stream, size_t offset)
+__inline__ int peek_char(struct tml_stream *stream, size_t offset)
 {
 	if (stream->index + offset < stream->data_size)
 		return stream->data[stream->index + offset];
@@ -43,7 +45,7 @@ inline int peek_char(struct tml_stream *stream, size_t offset)
 		return -1;
 }
 
-inline void next_char(struct tml_stream *stream)
+__inline__ void next_char(struct tml_stream *stream)
 {
 	stream->index++;
 }
@@ -55,6 +57,9 @@ char translate_escape_code(char code)
 		case 'r': return '\r';
 		case 't': return '\t';
 		case 's': return ' ';
+		/* special wildcard codes for pattern-match strings */
+		case '?': return 1; 
+		case '*': return 2;
 	default:
 		return code;
 	}
@@ -129,11 +134,11 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 	char *p = word_start;
 	bool shift_necessary = false;
 
-	// scan the word, collapsing escape codes in-place if necessary
+	/* scan the word, collapsing escape codes in-place if necessary */
 	int ch = peek_char(stream, 0);
 	while (!isspace(ch) && ch != -1 && ch != '|' && ch != '[' && ch != ']') {
 		if (ch == '\\') {
-			// substitute 2-character escape code with the character it represents
+			/* substitute 2-character escape code with the character it represents */
 			next_char(stream);
 			ch = peek_char(stream, 0);
 			if (ch == -1) break;
@@ -141,17 +146,17 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 			shift_necessary = true;
 		}
 		else if (shift_necessary) {
-			// shift character to the left collapsed position
+			/* shift character to the left collapsed position */
 			*p = (ch = peek_char(stream, 0));
 		}
 
-		// go on to the next potential character
+		/* go on to the next potential character */
 		p++;
 		next_char(stream);
 		ch = peek_char(stream, 0);
 	}
 
-	// return a reference to the data slice
+	/* return a reference to the data slice */
 	token->type = TML_TOKEN_ITEM;
 	token->value = word_start;
 	token->value_size = (p - word_start);

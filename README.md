@@ -5,7 +5,7 @@ It enables JSON-like and XML-like semantics within the same clean and consistent
 
 ### What is in this repository?
 
-This repo contains TML parsers and query APIs implemented in a variety of languages. These allow your applications to quickly and easily access data from TML files. Refer to a TML parser implementation folder for documentation on how to get started using TML files in your application language of choice.
+This repo contains TML parsers and query APIs implemented in a variety of languages. These allow your applications to quickly and easily access data from TML files. Refer to a TML parser implementation folder for examples and documentation on using TML data in your application.
 
 ##TML Syntax
 
