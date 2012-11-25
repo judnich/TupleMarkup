@@ -1,6 +1,6 @@
 #Tuple Markup Language
 
-An extremely simple all-purpose markup language: nested lists with syntax that alleviates "bracket overload".
+An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
 It enables JSON-like and XML-like semantics within the same clean and consistent language, plus much more.
 
 **NOTE:** _This project is very much a work-in-progress at the moment. While the language spec is mostly done, it still needs parser and read/write API implementations in as many languages as possible. Implementations in C, Javascript, and possibly Mozilla Rust, Google Go, and C++ are planned for the "official" release._
@@ -50,7 +50,7 @@ For special characters, you may use "\" for escape codes much like in C. Escape 
 
 These respectively evaluate to: newline code, return code, tab code, space, \, [, ], |, code 0x01, code 0x02.
 
-The last two, "\?" and "\*", are escape codes meant to be used as wildcard tokens by some TML APIs that allow you to use pattern-matching search queries on a TML tree (refer to the TML APIs documentation for more info). They don't have any unusual syntactic behavior.
+The last two, \\? and \\*, are escape codes meant to be used as wildcard tokens by some TML APIs that allow you to use pattern-matching search queries on a TML tree (refer to the TML APIs documentation for more info). They don't have any unusual syntactic behavior.
 
 ###Done.
 
