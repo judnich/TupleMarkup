@@ -21,7 +21,7 @@ You can nest tuples and data arbitrarily, for example:
 
     [ [blah blah] 1 2 3 [[x][y]] ]
 
-Writing empty tuples is also valid: "[]". Nesting tuples of tuples is a common case, so we provide two forms of special syntax for this.
+Writing empty tuples is also valid: "[]". Nesting tuples of tuples is a common case, so we provide a special syntax for this.
 
 ###Nesting Delimiter
 
