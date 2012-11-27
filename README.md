@@ -90,11 +90,11 @@ You can nest tuples and data arbitrarily, for example:
 
     [ [blah blah] 1 2 3 [[x][y]] ]
 
-Writing empty tuples is also valid: "[]". Nesting tuples of tuples is a common case, so we provide a special syntax for this.
+Writing empty tuples is also valid: `[]`. Nesting tuples of tuples is a common case, so we provide a special syntax for this.
 
 ###Nesting Delimiter
 
-The bar "|" delimiter creates a nested tuple out of each section it separates. For example:
+The bar `|` delimiter creates a nested tuple out of each section it separates. For example:
 
     [ position | 1 2 3 ]
 
@@ -102,26 +102,26 @@ is equivalent to:
 
     [ [position] [1 2 3] ]
 
-Empty tuples will also be generated with the "|" delimiter if you delimit nothingness: "[ | ]" is equivalent to "[ [] [] ]". 
+Empty tuples will also be generated with the `|` delimiter if you delimit nothingness: `[ | ]` is equivalent to `[ [] [] ]`. 
 
 
 ###Comments
 
-Line comments are supported. Simply prefix the comment with "||". For example:
+Line comments are supported. Simply prefix the comment with `||`. For example:
 
     || This is a line comment example.
 
 ###Escape Codes
 
-For special characters, you may use "\" for escape codes much like in C. Escape codes supported are:
+For special characters, you may use `\` for escape codes much like in C. Escape codes supported are:
 
     \n \r \t \s \\ \[ \] \| \? \*
 
-These respectively evaluate to: newline code, return code, tab code, space, \, [, ], |, code 0x01, code 0x02.
+These respectively evaluate to: `newline code, return code, tab code, space, \, [, ], |, code 0x01, code 0x02`.
 
-The last two, \\? and \\*, are escape codes meant to be used as wildcard tokens by some TML APIs that allow you to use pattern-matching search queries on a TML tree (refer to the TML APIs documentation for more info). They don't have any unusual syntactic behavior.
+The last two, `\?` and `\*`, are escape codes meant to be used as wildcard tokens by some TML APIs that allow you to use pattern-matching search queries on a TML tree (refer to the TML APIs documentation for more info). They don't have any unusual syntactic behavior.
 
 ###Done.
 
-That's it! You now know all of TML. Take a look at the examples below to see how it looks in use.
+That's it! You now know all of TML. Take a look at the examples if you haven't already to see how it looks in use.
 
