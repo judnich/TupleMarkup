@@ -12,8 +12,8 @@
  */
 
 #pragma once
-#ifndef _TML_PARSER_H__
-#define _TML_PARSER_H__
+#ifndef _TML_TOKENIZER_H__
+#define _TML_TOKENIZER_H__
 
 #include <ctype.h>
 
@@ -37,9 +37,7 @@ struct tml_token
 	size_t offset;
 };
 
-struct tml_stream tml_stream_open(char *data, size_t data_size);
-void tml_stream_close(struct tml_stream *stream);
-
+struct tml_stream tml_stream_start(char *data, size_t data_size);
 struct tml_token tml_stream_pop(struct tml_stream *stream);
 
 
