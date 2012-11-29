@@ -15,7 +15,7 @@ void stream_memzero(struct tml_stream *stream)
 	memset(stream, 0, sizeof(*stream));
 }
 
-struct tml_stream tml_stream_start(char *data, size_t data_size)
+struct tml_stream tml_stream_open(char *data, size_t data_size)
 {
 	struct tml_stream stream;
 	stream_memzero(&stream);
@@ -29,6 +29,12 @@ struct tml_stream tml_stream_start(char *data, size_t data_size)
 	stream.index = 0;
 
 	return stream;
+}
+
+void tml_stream_close(struct tml_stream *stream)
+{
+	if (stream)
+		stream_memzero(stream);
 }
 
 __inline__ int peek_char(struct tml_stream *stream, size_t offset)
