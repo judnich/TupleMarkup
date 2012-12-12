@@ -19,9 +19,9 @@
  * 3. When EOF token is returned, close/discard the tml_stream.
  * 4. Continue to use the token.value data as long as you like.
  * 5. Free the buffer from step 1, thus invalidating all token data.
-
- * If you really need to free the data buffer as soon as you close the token stream,
- * then just make your own local copies of token.value with memcpy first. */
+ * 
+ * If you really need to free the data buffer right after you close the token stream,
+ * then just make your own local copies of each token.value string with memcpy. */
 
 #pragma once
 #ifndef _TML_TOKENIZER_H__

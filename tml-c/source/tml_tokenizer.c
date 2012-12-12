@@ -128,6 +128,10 @@ void skip_to_next_line(struct tml_stream *stream)
 	}
 }
 
+/* This function is a bit messy unfortunately since it does efficient in-place parsing of "words"
+ * in such a way that no memory writes occur for words without escape codes. When escape codes are
+ * encountered, it collapses them to the actual character value in-place in memory. In either case,
+ * the token data generated from this operation points to word within the stream data memory. */
 void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 {
 	char *word_start = &stream->data[stream->index];
