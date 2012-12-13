@@ -1,4 +1,4 @@
-#include "../source/tml_parser.h"
+#include "../source/tml_tokenizer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
