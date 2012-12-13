@@ -3,7 +3,8 @@
  * Released as open-source under The MIT Licence.
  *
  * This parser loads an entire TML file into memory very efficiently in both space and time.
- * Storage space overhead is very low, with only 1 byte per node for lists of words. Malloc
+ * 
+ * Storage space overhead is very low, with only 1 byte per node for leaf nodes. Malloc
  * is called only once, and realloc is rarely used.
  *
  * Parsing essentially consists of reading from the token stream and writing variable length
@@ -22,7 +23,7 @@
  * If you need to load TML files over 4 GB into memory, then this can be changed larger. */
 typedef unsigned long tml_offset_t; 
 /* This should be kept consistent to be 2 to the power of sizeof(tml_offset_t) */
-#define TML_PARSER_MAX_FILE_SIZE 0xFFFF
+#define TML_PARSER_MAX_DATA_SIZE 0xFFFF
 
 struct tml_node
 {
@@ -38,7 +39,7 @@ struct tml_data
 {
 	struct tml_node root_node;
 	char *buff;
-	size_t buff_size, buff_allocated;
+	size_t buff_index, buff_allocated;
 	const char *error_msg;
 };
 

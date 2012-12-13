@@ -2,7 +2,7 @@
  * Copyright (C) 2012 John Judnich
  * Released as open-source under The MIT Licence.
  *
- * This lexer runs entirely in-place with no heap allocations whatosever.
+ * This lexer runs entirely in-place with no dynamic allocations whatosever.
  *
  * A memory buffer is given to the parser. The parser then reads through it on demand
  * and may modify it (e.g. collapsing escape codes). Returned token.value's are pointers
