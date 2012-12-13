@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2012 John Judnich
+ * Released as open-source under The MIT Licence.
+ *
+ * This parser loads an entire TML file into memory very efficiently in both space and time.
+ * Storage space overhead is very low, with only 1 byte per node for lists of words. Malloc
+ * is called only once, and realloc is rarely used.
+ *
+ * Parsing essentially consists of reading from the token stream and writing variable length
+ * node data into a large linear buffer. All node data is contained within this large buffer, 
+ * so malloc is unnecessary except for initially creating this buffer.
+ */
 
 #pragma once
 #ifndef _TML_PARSER_H__
@@ -6,10 +18,18 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+/* We use this typedef because 32 bit offset values are fine for any TML file under 4 GB.
+ * If you need to load TML files over 4 GB into memory, then this can be changed larger. */
+typedef unsigned long tml_offset_t; 
+/* This should be kept consistent to be 2 to the power of sizeof(tml_offset_t) */
+#define TML_PARSER_MAX_FILE_SIZE 0xFFFF
+
 struct tml_node
 {
-	size_t next_sibling;
-	size_t first_child;
+	/* 0 = no next sibling */
+	tml_offset_t next_sibling;
+	/* 0 = n next sibling */
+	tml_offset_t first_child;
 	/* NULL-terminated C string value of a leaf node (NULL if not a leaf) */
 	char *value;
 };
@@ -35,9 +55,12 @@ struct tml_data *tml_parse_file(char *filename);
 /* Call this to destroy a tml_data object. */
 void tml_free_data(struct tml_data *data);
 
-
 /* Returns an error description string if a parse error occurred, or NULL if no errors */
 const char *tml_parse_error(struct tml_data *data);
+
+/* Returns the root node for data represented by the tml_data object */
+struct tml_node tml_data_root(struct tml_data *data);
+
 
 /* Returns a new tml_node representing the next sibling after this node, if it exists.
  * If no such sibling exists, a null tml_node value will be returned. Test for this
