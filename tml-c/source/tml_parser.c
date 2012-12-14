@@ -1,11 +1,13 @@
 #include "tml_parser.h"
 #include "tml_tokenizer.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 /*
  * Data is parsed and inserted into memory using a packed format to reduce the 
  * overhead that would otherwise be incurred by the tree linkings (~9 bytes per node).
- * This format compresses that down to only 1 byte overhead per node for all sibling
- * leaf nodes.
+ * This format compresses that down to only 1 byte overhead per node for leaf nodes.
  *
  * A node begins with the pointer data, followed by a null terminated value string IF
  * the pointer data indicates that this node is a leaf node.
@@ -13,21 +15,17 @@
  * The pointer data is variable length, and has two forms:
  *
  * 1) One form is a single byte with value 0-254. In this case this value represents 
- * the relative offset to skip within the parsed data buffer to find the next subling node,
- * and also indicates that this is a leaf node (no child node pointer).
+ * the relative offset to skip within the parsed data buffer to find the next subling node
+ * (or 0 if no next sibling), and also indicates that this is a leaf node.
  *
  * 2) If the first byte is 255 then the next following bytes are a next_sibling
  * absolute offset followed by a first_child absolute offset.
- *
- * Because of the way the | nesting operator works (modifying the nesting depth of previously
- * parsed stuff), the parser needs to be able to insert an intermediate parent node sometimes.
- * To make this possible without shifting around memory, the parsing mechanism can just
- * enforce that all nodes following an open paren don't use the compressed form pointer data.
  */
 
 
 void set_parse_error(struct tml_data *data, const char *error_msg);
 void parse_root(struct tml_data *data, struct tml_stream *tokens);
+struct node_link_data *parse_list_node(struct tml_data *data, struct tml_stream *tokens);
 
 
 #define FULL_NODE_DATA_FLAG 0xFF
@@ -71,7 +69,7 @@ struct tml_data *tml_parse_memory(char *ibuff, size_t ibuff_size)
 	data->buff = malloc(data->buff_allocated);
 
 	struct tml_stream tokens = tml_stream_open(ibuff, ibuff_size);
-	parse_node(data, &tokens);
+	parse_root(data, &tokens);
 	tml_stream_close(&tokens);
 
 	return data;
@@ -103,7 +101,7 @@ struct tml_node tml_data_root(struct tml_data *data)
 }
 
 
-struct node_link_data *write_node(struct tml_data *data, char *str, int str_len)
+struct node_link_data *write_node(struct tml_data *data, const char *str, int str_len)
 {
 	size_t index = data->buff_index;
 
@@ -112,7 +110,7 @@ struct node_link_data *write_node(struct tml_data *data, char *str, int str_len)
 
 	/* write node link data */
 	struct node_link_data *ptr = (struct node_link_data*)data->buff;
-	ptr->dummy = 0xFF; // code for a full node metadata
+	ptr->flag = 0xFF; // code for a full node metadata
 	ptr->next_sibling = 0;
 	ptr->first_child = 0;
 	index += sizeof(struct node_link_data);
@@ -131,7 +129,7 @@ struct node_link_data *write_node(struct tml_data *data, char *str, int str_len)
 	return ptr;
 }
 
-void write_packed_node(struct tml_data *data, char *str, int str_len, int sibling_offset)
+void write_packed_node(struct tml_data *data, const char *str, int str_len, int sibling_offset)
 {
 	size_t index = data->buff_index;
 
@@ -166,7 +164,7 @@ void parse_root(struct tml_data *data, struct tml_stream *tokens)
 		return;
 	}
 
-	parse_list(data, tokens);
+	parse_list_node(data, tokens);
 
 	token = tml_stream_pop(tokens);
 
@@ -181,11 +179,90 @@ void parse_root(struct tml_data *data, struct tml_stream *tokens)
 
 /* Parses "...]", a list where we assume that the opening brace has been read. 
  * After returning from this function, the stream will have read the closing brace. */
-void parse_list_node(struct tml_data *data, struct tml_stream *tokens)
+struct node_link_data *parse_list_node(struct tml_data *data, struct tml_stream *tokens)
 {
-	struct tml_token token = tml_stream_pop(tokens);
+	/* this is the container node for the list contents */
+	struct node_link_data *root_node = write_node(data, NULL, 0);
 
+	struct tml_token token, last_token;
+	bool peeked = false;
 
+	for (;;) {
+		/* read the next token, if we haven't already peeked at it */
+		if (!peeked) {
+			last_token = token;
+			token = tml_stream_pop(tokens);
+		} else {
+			peeked = false;
+		}
+
+		if (token.type == TML_TOKEN_ITEM) {
+			/* record the first child under this list */
+			if (!root_node->first_child)
+				root_node->first_child = data->buff_index;
+
+			/* peek ahead to see if there is a next sibling */
+			last_token = token;
+			token = tml_stream_pop(tokens);
+			peeked = true;
+
+			if (token.type == TML_TOKEN_CLOSE || token.type == TML_TOKEN_EOF) {
+				/* this is the last element of a list, so use next_sibling offset = 0 */
+				write_packed_node(data, last_token.value, last_token.value_size, 0);
+			}
+			else {
+				/* this is a regular leaf node with a next sibling */
+				if (last_token.value_size < FULL_NODE_DATA_FLAG) {
+					/* length of this leaf node string is under 255 characters */
+					int sibling_offset = last_token.value_size;
+					write_packed_node(data, last_token.value, last_token.value_size, sibling_offset);
+				}
+				else {
+					/* length of contents exceeds 255 characters so use full 32-bit node link data */
+					struct node_link_data *n = write_node(data, last_token.value, last_token.value_size);
+					n->next_sibling = data->buff_index;
+				}
+			}
+		}
+		else if (token.type == TML_TOKEN_OPEN) {
+			/* record the first child under this list */
+			if (!root_node->first_child)
+				root_node->first_child = data->buff_index;
+
+			/* recurse into a new list item */
+			struct node_link_data *list_node = parse_list_node(data, tokens);
+
+			/* peek ahead to see if there is a next sibling */
+			last_token = token;
+			token = tml_stream_pop(tokens);
+			peeked = true;
+
+			/* set the list's next node link the current writing position if there are more list items */
+			if (token.type == TML_TOKEN_CLOSE || token.type == TML_TOKEN_EOF) {
+				list_node->next_sibling = 0;
+			}
+			else {
+				list_node->next_sibling = data->buff_index;
+			}
+		}
+		else if (token.type == TML_TOKEN_DIVIDER) {
+			/* todo - 
+			 * the idea for how this works in a single pass is, when a divider is encountered, the root_node
+			 * first_child* pointer is "rewired" to point to a new intermediate list node created here. this
+			 * intermediate node then is created to point back to the "original" first child node, creating the 
+			 * desired double nesting. then, another nested list node is created for the upcoming items after the
+			 * bar (since they're also nested) and each following bar creates a new intermediate node.
+			 */
+		}
+		else if (token.type == TML_TOKEN_CLOSE || token.type == TML_TOKEN_EOF) {
+			if (token.type == TML_TOKEN_EOF) {
+				set_parse_error(data, "Expected closing bracket on list");
+			}
+			break;
+		}
+	}
+
+	return root_node;
 }
 
 

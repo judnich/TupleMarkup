@@ -2,14 +2,14 @@
  * Copyright (C) 2012 John Judnich
  * Released as open-source under The MIT Licence.
  *
- * This parser loads an entire TML file into memory very efficiently in both space and time.
+ * This parser loads an entire TML file into memory very efficiently in both time and space.
  * 
- * Storage space overhead is very low, with only 1 byte per node for leaf nodes. Malloc
- * is called only once, and realloc is rarely used.
+ * Storage space overhead is very low, with only 1 extra byte per leaf node and exactly 9 bytes
+ * for nonleaf (list) nodes. Malloc is called only once, and realloc is rarely used.
  *
- * Parsing essentially consists of reading from the token stream and writing variable length
- * node data into a large linear buffer. All node data is contained within this large buffer, 
- * so malloc is unnecessary except for initially creating this buffer.
+ * The parsing process consists of reading from the token stream and writing variable length
+ * node data (along with leaf node contents strings) into one big array buffer. All node data is
+ * contained within this buffer, so malloc is unnecessary except for initially creating this buffer.
  */
 
 #pragma once
@@ -18,10 +18,11 @@
 
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /* We use this typedef because 32 bit offset values are fine for any TML file under 4 GB.
  * If you need to load TML files over 4 GB into memory, then this can be changed larger. */
-typedef unsigned long tml_offset_t; 
+typedef uint32_t tml_offset_t; 
 /* This should be kept consistent to be 2 to the power of sizeof(tml_offset_t) */
 #define TML_PARSER_MAX_DATA_SIZE 0xFFFF
 
@@ -29,7 +30,7 @@ struct tml_node
 {
 	/* 0 = no next sibling */
 	tml_offset_t next_sibling;
-	/* 0 = n next sibling */
+	/* 0 = no child node */
 	tml_offset_t first_child;
 	/* NULL-terminated C string value of a leaf node (NULL if not a leaf) */
 	char *value;
