@@ -3,10 +3,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
 
 /*
  * Data is parsed and inserted into memory using a packed format to reduce the 
- * overhead that would otherwise be incurred by the tree linkings (~9 bytes per node).
+ * overhead that would otherwise be incurred by the tree linkings (~10 bytes per node).
  * This format compresses that down to only 1 byte overhead per node for leaf nodes.
  *
  * A node begins with the pointer data, followed by a null terminated value string IF
@@ -71,6 +73,44 @@ struct tml_data *tml_parse_memory(char *ibuff, size_t ibuff_size)
 	struct tml_stream tokens = tml_stream_open(ibuff, ibuff_size);
 	parse_root(data, &tokens);
 	tml_stream_close(&tokens);
+
+	return data;
+}
+
+struct tml_data *tml_parse_string(char *str)
+{
+	size_t len = strlen(str);
+	return tml_parse_memory(str, len);
+}
+
+struct tml_data *tml_parse_file(char *filename)
+{
+	long int fsize;
+
+	FILE *fp = fopen(filename, "rb");
+	if (!fp)
+		return NULL;
+
+	fseek(fp, 0, SEEK_END);
+	fsize = ftell(fp); /* get file size */
+	rewind(fp);
+
+	char *buff = malloc(sizeof(char) * fsize);
+	if (!buff) {
+		fclose(fp);
+		return NULL;
+	}
+
+	if (fsize != fread(buff, 1, fsize, fp)) {
+		fclose(fp);
+		free(buff);
+		return NULL;
+	}
+
+	struct tml_data *data = tml_parse_memory(buff, fsize);
+
+	fclose(fp);
+	free(buff);
 
 	return data;
 }
@@ -265,6 +305,25 @@ struct node_link_data *parse_list_node(struct tml_data *data, struct tml_stream 
 	return root_node;
 }
 
+
+
+/* ------------------------------------ UTILITY FUNCTIONS ------------------------------------------------ */
+
+char *write_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str_size)
+{
+	if (tml_is_node_leaf(node)) {
+		size_t nodelen = strlen(node->value)
+		
+	}
+}
+
+void tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str_size)
+{
+	char *str = write_node_to_string(node, dest_str, dest_str_size);
+	if (str - dest_str < dest_str_size)
+		*str = '\0';
+	return str;
+}
 
 
 

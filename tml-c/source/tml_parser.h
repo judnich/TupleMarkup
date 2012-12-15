@@ -4,7 +4,7 @@
  *
  * This parser loads an entire TML file into memory very efficiently in both time and space.
  * 
- * Storage space overhead is very low, with only 1 extra byte per leaf node and exactly 9 bytes
+ * Storage space overhead is very low, with only 1 extra byte per leaf node and exactly 10 bytes
  * for nonleaf (list) nodes. Malloc is called only once, and realloc is rarely used.
  *
  * The parsing process consists of reading from the token stream and writing variable length
@@ -44,6 +44,7 @@ struct tml_data
 	const char *error_msg;
 };
 
+/* --------------- DATA PARSE FUNCTIONS -------------------- */
 
 /* Create a new tml_data object, parsing from TML text contained within the given memory buffer. */
 struct tml_data *tml_parse_memory(char *buff, size_t buff_size);
@@ -63,6 +64,8 @@ const char *tml_parse_error(struct tml_data *data);
 /* Returns the root node for data represented by the tml_data object */
 struct tml_node tml_data_root(struct tml_data *data);
 
+
+/* --------------- NODE ITERATION FUNCTIONS -------------------- */
 
 /* Returns a new tml_node representing the next sibling after this node, if it exists.
  * If no such sibling exists, a null tml_node value will be returned. Test for this
@@ -90,6 +93,25 @@ bool tml_is_node_null(struct tml_node *node); /* O(1) time */
  * or directly as a C string from (char*)node->value. */
 bool tml_is_node_leaf(struct tml_node *node); /* O(1) time */
 
+
+/* --------------- UTILITY FUNCTIONS (CONVERSION) -------------------- */
+
+/* Converts the contents of this node into a string, minus TML notation. For example if
+ * the node represents the subtree "[a [b [c]] d]", the result will be "a b c d".
+ * Returns the length of the resulting string. */
+size_t tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
+
+/* Returns the length of the string which will be produced by a call to tml_node_to_string(node) */
+size_t tml_node_to_string_len(struct tml_node *node);
+
+/* Converts the contents of this node into a string, minus TML notation. For example if
+ * the node represents the subtree "[a [b [c]] d]", the result will be "[a [b [c]] d]".
+ * Returns the length of the resulting string. */
+size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
+
+/* Returns the length of the string which will be produced by a call to tml_node_to_markup_string(node) */
+size_t tml_node_to_markup_string_len(struct tml_node *node);
+
 /* Converts the contents of this node into an double value */
 double tml_node_to_double(struct tml_node *node);
 
@@ -99,13 +121,24 @@ float tml_node_to_float(struct tml_node *node);
 /* Converts the contents of this node into an integer value */
 int tml_node_to_int(struct tml_node *node);
 
-/* Converts the contents of this node into a string, minus TML notation. For example if
- * the node represents the subtree "[a [b [c]] d]", the result will be "a b c d". */
-void tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
 
-/* Converts the contents of this node into a string, minus TML notation. For example if
- * the node represents the subtree "[a [b [c]] d]", the result will be "[a [b [c]] d]". */
-void tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
+/* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */
+
+/* This is a powerful function which allows you not only to compare two nodes for value equality, but
+ * also match a node against a pattern with various types of wildcards. For standard equality comparison,
+ * this works very straightforwardly. It will return true if both sides are equivalent (e.g. if the left
+ * represents [1 2 3] and the right also represents [1 2 3], even if they're from different nodes or
+ * entirely different tml_data objects). Pattern matching allows you to match the left side against a
+ * pattern on the right side which may include wildcards. TODO: More documentation on this. */
+bool tml_compare_nodes(struct tml_node *candidate, struct tml_node *pattern);
+
+/* Finds the next sibling after this node that matches the given pattern, if any.
+ * See tml_compare_nodes() for more info on how pattern matching works. */
+struct tml_node tml_find_next_sibling(struct tml_node *node, struct tml_node *pattern);
+
+/* Finds the first child under this node that matches the given pattern, if any.
+ * See tml_compare_nodes() for more info on how pattern matching works. */
+struct tml_node tml_find_first_child(struct tml_node *node, struct tml_node *pattern);
 
 
 
