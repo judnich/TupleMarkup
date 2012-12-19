@@ -28,11 +28,10 @@ typedef uint32_t tml_offset_t;
 
 struct tml_node
 {
-	/* 0 = no next sibling */
+	char *buff;
+	bool leaf_node;
 	tml_offset_t next_sibling;
-	/* 0 = no child node */
 	tml_offset_t first_child;
-	/* NULL-terminated C string value of a leaf node (NULL if not a leaf) */
 	char *value;
 };
 
@@ -88,8 +87,9 @@ struct tml_node tml_child_at_index(struct tml_node *node, int child_index); /* O
  * Use this function to determined whether that is a null node or not. */
 bool tml_is_node_null(struct tml_node *node); /* O(1) time */
 
-/* Returns true if this is a leaf node. Leav nodes have no children and have a string value.
- * This string value can be retrieved using tml_node_to_string() to copy it to some destination,
+/* Returns true if this is a leaf node. Leaf nodes have no children and may have a string value.
+ * If your TML file contained a null list "[]", then it will appear as a leaf node with no string value.
+ * Otherwise, the string value can be retrieved using tml_node_to_string() to copy it to some destination,
  * or directly as a C string from (char*)node->value. */
 bool tml_is_node_leaf(struct tml_node *node); /* O(1) time */
 
@@ -101,25 +101,19 @@ bool tml_is_node_leaf(struct tml_node *node); /* O(1) time */
  * Returns the length of the resulting string. */
 size_t tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
 
-/* Returns the length of the string which will be produced by a call to tml_node_to_string(node) */
-size_t tml_node_to_string_len(struct tml_node *node);
-
 /* Converts the contents of this node into a string, minus TML notation. For example if
  * the node represents the subtree "[a [b [c]] d]", the result will be "[a [b [c]] d]".
  * Returns the length of the resulting string. */
 size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
 
-/* Returns the length of the string which will be produced by a call to tml_node_to_markup_string(node) */
-size_t tml_node_to_markup_string_len(struct tml_node *node);
-
 /* Converts the contents of this node into an double value */
-double tml_node_to_double(struct tml_node *node);
+//TODO: double tml_node_to_double(struct tml_node *node);
 
 /* Converts the contents of this node into an float value */
-float tml_node_to_float(struct tml_node *node);
+//TODO:float tml_node_to_float(struct tml_node *node);
 
 /* Converts the contents of this node into an integer value */
-int tml_node_to_int(struct tml_node *node);
+//TODO:int tml_node_to_int(struct tml_node *node);
 
 
 /* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */
@@ -130,15 +124,15 @@ int tml_node_to_int(struct tml_node *node);
  * represents [1 2 3] and the right also represents [1 2 3], even if they're from different nodes or
  * entirely different tml_data objects). Pattern matching allows you to match the left side against a
  * pattern on the right side which may include wildcards. TODO: More documentation on this. */
-bool tml_compare_nodes(struct tml_node *candidate, struct tml_node *pattern);
+//TODO:bool tml_compare_nodes(struct tml_node *candidate, struct tml_node *pattern);
 
 /* Finds the next sibling after this node that matches the given pattern, if any.
  * See tml_compare_nodes() for more info on how pattern matching works. */
-struct tml_node tml_find_next_sibling(struct tml_node *node, struct tml_node *pattern);
+//TODO:struct tml_node tml_find_next_sibling(struct tml_node *node, struct tml_node *pattern);
 
 /* Finds the first child under this node that matches the given pattern, if any.
  * See tml_compare_nodes() for more info on how pattern matching works. */
-struct tml_node tml_find_first_child(struct tml_node *node, struct tml_node *pattern);
+//TODO:struct tml_node tml_find_first_child(struct tml_node *node, struct tml_node *pattern);
 
 
 
