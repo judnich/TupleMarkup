@@ -34,6 +34,7 @@ size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool pr
 const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
 
 
+/* returns false if out of memory */
 void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 {
 	if (new_size >= TML_PARSER_MAX_DATA_SIZE) {
@@ -41,22 +42,27 @@ void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 			"TML data file is too large, parsed data structures exceeded TML_PARSER_MAX_DATA_SIZE.");
 	}
 
-	if (new_size > data->buff_allocated) {
+	if (new_size > data->buff_allocated && data->buff) {
 		data->buff_allocated *= 2;
 		data->buff = realloc(data->buff, data->buff_allocated);
 	}
 }
 
+/* returns false if realloc somehow failed */
 void shrink_buffer(struct tml_data *data)
 {
-	data->buff_allocated = data->buff_index;
-	data->buff = realloc(data->buff, data->buff_allocated);
+	if (data->buff) {
+		data->buff_allocated = data->buff_index;
+		data->buff = realloc(data->buff, data->buff_allocated);
+	}
 }
 
 
 struct tml_data *tml_parse_memory(char *ibuff, size_t ibuff_size)
 {
 	struct tml_data *data = malloc(sizeof(*data));
+	if (!data) return NULL;
+
 	memset(data, 0, sizeof(*data));
 
 	data->error_msg = NULL;
@@ -64,11 +70,22 @@ struct tml_data *tml_parse_memory(char *ibuff, size_t ibuff_size)
 	data->buff_allocated = ibuff_size * 2;
 	data->buff = malloc(data->buff_allocated);
 
+	if (!data->buff) {
+		free(data);
+		return NULL;
+	}
+
 	struct tml_stream tokens = tml_stream_open(ibuff, ibuff_size);
 	parse_root(data, &tokens);
 	tml_stream_close(&tokens);
 
 	shrink_buffer(data);
+
+	if (data->buff == NULL) {
+		/* buff is NULL if realloc has failed */
+		free(data);
+		return NULL;
+	}
 
 	data->root_node.buff = data->buff;
 
@@ -146,6 +163,8 @@ void write_packed_node(struct tml_data *data, const char *str, int str_len, int 
 	grow_buffer_if_needed(data, 
 		index + sizeof(char) + (str_len + 1) * sizeof(char));
 
+	if (data->buff == NULL) return; /* in case realloc fails */
+
 	/* write sibling offset byte */
 	((unsigned char*)data->buff)[index] = (unsigned char)sibling_offset;
 	index += sizeof(unsigned char);
@@ -169,6 +188,8 @@ size_t write_node(struct tml_data *data, const char *str, int str_len)
 
 	grow_buffer_if_needed(data, 
 		index + NODE_LINK_DATA_SIZE + (str_len + 1) * sizeof(char));
+
+	if (data->buff == NULL) return 0; /* in case realloc fails */
 
 	/* write node link data */
 	char *ptr = &data->buff[index];
@@ -237,11 +258,13 @@ void parse_root(struct tml_data *data, struct tml_stream *tokens)
 		return;
 	}
 
-	data->root_node.buff = data->buff;
-	data->root_node.value = NULL;
-	data->root_node.leaf_node = false;
-	data->root_node.next_sibling = 0;
-	data->root_node.first_child = get_node_child(&data->buff[root_node_offset]);
+	if (root_node_offset && data->buff) {
+		data->root_node.buff = data->buff;
+		data->root_node.value = NULL;
+		data->root_node.leaf_node = false;
+		data->root_node.next_sibling = 0;
+		data->root_node.first_child = get_node_child(&data->buff[root_node_offset]);
+	}
 
 	return;
 }
@@ -344,6 +367,11 @@ size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool pr
 		}
 		else if (token.type == TML_TOKEN_CLOSE || token.type == TML_TOKEN_EOF) {
 			break;
+		}
+
+		/* in case out of memory */
+		if (!data->buff) {
+			return 0;
 		}
 	}
 

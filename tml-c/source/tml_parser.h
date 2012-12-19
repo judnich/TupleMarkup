@@ -9,7 +9,7 @@
  *
  * The parsing process consists of reading from the token stream and writing variable length
  * node data (along with leaf node contents strings) into one big array buffer. All node data is
- * contained within this buffer, so malloc is unnecessary except for initially creating this buffer.
+ * contained within this buffer, so malloc isn't used except to initially create this buffer.
  */
 
 #pragma once
