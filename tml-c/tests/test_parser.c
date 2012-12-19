@@ -5,7 +5,7 @@
 int main(void)
 {
 	struct tml_data *data = tml_parse_string(
-		"[| bold | this is a [italic | test], testing one two three! | hi |]"
+		"[bold | this is a [italic | test], testing one two three!]"
 	);
 
 	struct tml_node root = tml_data_root(data);
