@@ -10,6 +10,10 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#define TML_OPEN_CHAR '['
+#define TML_CLOSE_CHAR ']'
+#define TML_DIVIDER_CHAR '|'
+
 void stream_memzero(struct tml_stream *stream)
 {
 	memset(stream, 0, sizeof(*stream));
@@ -85,19 +89,19 @@ struct tml_token tml_stream_pop(struct tml_stream *stream)
 
 		token.offset = stream->index;
 
-		if (ch == '[') {
+		if (ch == TML_OPEN_CHAR) {
 			next_char(stream);
 			token.type = TML_TOKEN_OPEN;
 			return token;
 		}
-		else if (ch == ']') {
+		else if (ch == TML_CLOSE_CHAR) {
 			next_char(stream);
 			token.type = TML_TOKEN_CLOSE;
 			return token;
 		}
-		else if (ch == '|') {
+		else if (ch == TML_DIVIDER_CHAR) {
 			next_char(stream);
-			if (peek_char(stream, 0) == '|') {
+			if (peek_char(stream, 0) == TML_DIVIDER_CHAR) {
 				skip_to_next_line(stream);
 				continue;
 			}
@@ -140,7 +144,9 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 
 	/* scan the word, collapsing escape codes in-place if necessary */
 	int ch = peek_char(stream, 0);
-	while (!isspace(ch) && ch != -1 && ch != '|' && ch != '[' && ch != ']') {
+	while (!isspace(ch) && ch != -1 && 
+		ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
+	{
 		if (ch == '\\') {
 			/* substitute 2-character escape code with the character it represents */
 			next_char(stream);
