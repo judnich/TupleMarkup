@@ -107,13 +107,13 @@ size_t tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str
 size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t dest_str_size);
 
 /* Converts the contents of this node into an double value */
-//TODO: double tml_node_to_double(struct tml_node *node);
+double tml_node_to_double(struct tml_node *node);
 
 /* Converts the contents of this node into an float value */
-//TODO:float tml_node_to_float(struct tml_node *node);
+float tml_node_to_float(struct tml_node *node);
 
 /* Converts the contents of this node into an integer value */
-//TODO:int tml_node_to_int(struct tml_node *node);
+int tml_node_to_int(struct tml_node *node);
 
 
 /* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */

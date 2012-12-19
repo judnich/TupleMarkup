@@ -526,5 +526,25 @@ size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t d
 	}
 }
 
+double tml_node_to_double(struct tml_node *node)
+{
+	if (node->value && node->value[0] != 0) {
+		return atof(node->value);
+	}
+	else return 0;
+}
+
+float tml_node_to_float(struct tml_node *node)
+{
+	return tml_node_to_double(node);
+}
+
+int tml_node_to_int(struct tml_node *node)
+{
+	if (node->value && node->value[0] != 0) {
+		return atoi(node->value);
+	}
+	else return 0;
+}
 
 
