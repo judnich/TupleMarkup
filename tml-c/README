@@ -3,19 +3,19 @@ What is TML?
 	TML (Tuple Markup Language)
 	github.com/judnich/TupleMarkup
 
-    An extremely simple all-purpose markup language: nested lists with 
-    bracket-minimizing syntax. It enables JSON-like and XML-like semantics 
-    within the same clean and consistent language, plus much more.
+	An extremely simple all-purpose markup language: nested lists with 
+	bracket-minimizing syntax. It enables JSON-like and XML-like semantics 
+	within the same clean and consistent language, plus much more.
 
 
-What is this folder? 
+What's in this folder? 
 
 	This folder contains a TML parser and utilities implemented in C.
 
 	The parser is written to be extremely memory efficient and fast. Memory usage
-	is so compact, this could be easily modified to be used in embedded systems 
-	where malloc() is not used at all (parsing data structures are written and packed
-	into a single internal data buffer).
+	is compact enough that this could be easily modified for use in embedded systems
+	where malloc() is not used at all (since parsing data structures are written and
+	packed into a single internal data buffer).
 
 	It should be compatible with any C89 compiler (C89 was used in favor of
 	C99 only to maximize compatibility). Unicode should work fine as long
