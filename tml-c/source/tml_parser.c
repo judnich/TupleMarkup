@@ -258,10 +258,9 @@ void parse_root(struct tml_data *data, struct tml_stream *tokens)
 		return;
 	}
 
-	if (root_node_offset && data->buff) {
+	if (data->buff) {
 		data->root_node.buff = data->buff;
-		data->root_node.value = NULL;
-		data->root_node.leaf_node = false;
+		data->root_node.value = "";
 		data->root_node.next_sibling = 0;
 		data->root_node.first_child = get_node_child(&data->buff[root_node_offset]);
 	}
@@ -388,7 +387,7 @@ size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool pr
 
 /* --------------- NODE ITERATION FUNCTIONS -------------------- */
 
-struct tml_node NULL_NODE = { 0, 0, 0, 0, 0 };
+struct tml_node NULL_NODE = { 0, 0, 0, 0 };
 
 struct tml_node read_node(char *buff, char *ptr)
 {
@@ -399,24 +398,19 @@ struct tml_node read_node(char *buff, char *ptr)
 		/* read full node links */
 		node.first_child = get_node_child(ptr);
 		node.next_sibling = get_node_sibling(ptr);
-		node.leaf_node = (node.first_child == 0);
-
-		ptr += NODE_LINK_DATA_SIZE;
+		node.value = &ptr[NODE_LINK_DATA_SIZE];
 	}
 	else {
 		/* read packed node links */
-		node.leaf_node = true;
 		node.first_child = 0;
+
 		if (ptr[0] == 0)
 			node.next_sibling = 0;
 		else
 			node.next_sibling = (ptr - buff) + 2 + ((unsigned char*)ptr)[0];
 
-		ptr += sizeof(char);
+		node.value = &ptr[1];
 	}
-
-	/* node value string follows link data */
-	node.value = (char*)ptr;
 
 	return node;
 }
@@ -431,7 +425,7 @@ struct tml_node tml_next_sibling(struct tml_node *node)
 
 struct tml_node tml_first_child(struct tml_node *node)
 {
-	if (!node->leaf_node)
+	if (node->first_child)
 		return read_node(node->buff, node->buff + node->first_child);
 	else
 		return NULL_NODE;
@@ -463,12 +457,12 @@ struct tml_node tml_child_at_index(struct tml_node *node, int child_index)
 
 bool tml_is_node_null(struct tml_node *node)
 {
-	return node->buff == 0; //(node->next_sibling == 0 && node->first_child == 0 && node->value == 0);
+	return node->buff == 0;
 }
 
 bool tml_is_node_leaf(struct tml_node *node)
 {
-	return node->leaf_node;
+	return node->first_child == 0;
 }
 
 
@@ -484,8 +478,13 @@ char *write_node_to_string(struct tml_node *node, char *dest_str, char *dest_end
 
 		size_t nodelen = strlen(value);
 		if (nodelen == 0) {
-			value = "[]";
-			nodelen = 2;
+			if (write_brackets) {
+				value = "[]";
+				nodelen = 2;
+			}
+			else {
+				return dest_str;
+			}
 		}
 
 		size_t dest_str_size = dest_end - dest_str - 1;
@@ -536,7 +535,7 @@ size_t tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str
 		return result_size;
 	}
 	else {
-		return 0; // error - this shouldn't happen
+		return 0; /* error - this shouldn't happen */
 	}
 }
 
@@ -550,7 +549,7 @@ size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t d
 		return result_size;
 	}
 	else {
-		return 0; // error - this shouldn't happen
+		return 0; /* error - this shouldn't happen */
 	}
 }
 

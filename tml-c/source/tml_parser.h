@@ -29,7 +29,6 @@ typedef uint32_t tml_offset_t;
 struct tml_node
 {
 	char *buff;
-	bool leaf_node;
 	tml_offset_t next_sibling;
 	tml_offset_t first_child;
 	char *value;
@@ -124,15 +123,15 @@ int tml_node_to_int(struct tml_node *node);
  * represents [1 2 3] and the right also represents [1 2 3], even if they're from different nodes or
  * entirely different tml_data objects). Pattern matching allows you to match the left side against a
  * pattern on the right side which may include wildcards. TODO: More documentation on this. */
-//TODO:bool tml_compare_nodes(struct tml_node *candidate, struct tml_node *pattern);
+/*TODO:bool tml_compare_nodes(struct tml_node *candidate, struct tml_node *pattern);*/
 
 /* Finds the next sibling after this node that matches the given pattern, if any.
  * See tml_compare_nodes() for more info on how pattern matching works. */
-//TODO:struct tml_node tml_find_next_sibling(struct tml_node *node, struct tml_node *pattern);
+/*TODO:struct tml_node tml_find_next_sibling(struct tml_node *node, struct tml_node *pattern);*/
 
 /* Finds the first child under this node that matches the given pattern, if any.
  * See tml_compare_nodes() for more info on how pattern matching works. */
-//TODO:struct tml_node tml_find_first_child(struct tml_node *node, struct tml_node *pattern);
+/*TODO:struct tml_node tml_find_first_child(struct tml_node *node, struct tml_node *pattern);*/
 
 
 

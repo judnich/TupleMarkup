@@ -62,71 +62,53 @@ void print_stream(char *dest, struct tml_stream *stream)
 	print_token(dest, token);
 }
 
+int g_test_num = 0, g_pass_count = 0;
 
-int parse_and_redisplay_test(char *str_to_parse, char *str_to_verify)
+void test_parser(char *str_to_parse, char *str_to_verify)
 {
-	int ret = 0;
 	char buff[2048];
 	struct tml_stream *stream = create_stream(str_to_parse);
 
-	print_stream(buff, stream);
-	ret = strcmp(buff, str_to_verify);
+	g_test_num++;
+	printf("#%d ", g_test_num);
 
-	if (ret != 0) printf("%s\n", buff);
+	print_stream(buff, stream);
+	
+	if (strcmp(buff, str_to_verify) == 0) {
+		printf("PASS\n");
+		g_pass_count++;
+	}
+	else {
+		printf("FAIL: Produced \"%s\". Expected \"%s\".\n", buff, str_to_verify);
+	}
+
 	destroy_stream(stream);
-	return ret;
+	return;
 }
 
-
-void test_assert(int i, int r)
+void print_report()
 {
-	printf("#%d ", i);
-	if (r != 0) printf("FAIL\n");
-	else printf("PASS\n");
+	int pp = (int)(100 * (float)g_pass_count / (float)g_test_num);
+	printf("\n - Tokenizer Test Suite: %d tests executed, %d passed (%d%%).\n\n", g_test_num, g_pass_count, pp);
 }
 
 
 int main(void)
 {
-	test_assert( 1, 
-		parse_and_redisplay_test("[ [a|] || this is a comment\n b c |\n 1 2 3 ]", "[[a |]b c |1 2 3 ] ||EOF") 
-	);
+	printf("\n==== TML Tokenizer Test Suite ====\n\n");
 
-	test_assert( 2, 
-		parse_and_redisplay_test("[|[|[|[|[|!@#]]]]]", "[|[|[|[|[|!@# ]]]]] ||EOF") 
-	);
+	test_parser("[ [a|] || this is a comment\n b c |\n 1 2 3 ]", "[[a |]b c |1 2 3 ] ||EOF");
+	test_parser("[|[|[|[|[|!@#]]]]]", "[|[|[|[|[|!@# ]]]]] ||EOF");
+	test_parser("[|right\\[ stuff]", "[|right[ stuff ] ||EOF");
+	test_parser("[left stuff|]", "[left stuff |] ||EOF");
+	test_parser("[a b c|1 2 3]", "[a b c |1 2 3 ] ||EOF");
+	test_parser("[[", "[[ ||EOF");
+	test_parser("[hello", "[hello  ||EOF");
+	test_parser("\\\\", "\\  ||EOF");
+	test_parser("\\", "  ||EOF");
+	test_parser("[  ]", "[] ||EOF");
 
-	test_assert( 3, 
-		parse_and_redisplay_test("[|right\\[ stuff]", "[|right[ stuff ] ||EOF") 
-	);
-
-	test_assert( 4, 
-		parse_and_redisplay_test("[left stuff|]", "[left stuff |] ||EOF") 
-	);
-
-	test_assert( 5, 
-		parse_and_redisplay_test("[a b c|1 2 3]", "[a b c |1 2 3 ] ||EOF") 
-	);
-
-	test_assert( 6, 
-		parse_and_redisplay_test("[[", "[[ ||EOF") 
-	);
-
-	test_assert( 7, 
-		parse_and_redisplay_test("[hello", "[hello  ||EOF") 
-	);
-
-	test_assert( 8, 
-		parse_and_redisplay_test("\\\\", "\\  ||EOF") 
-	);
-
-	test_assert( 9, 
-		parse_and_redisplay_test("\\", "  ||EOF") 
-	);
-
-	test_assert( 10, 
-		parse_and_redisplay_test("[  ]", "[] ||EOF") 
-	);
+	print_report();
 
 	return 0;
 }

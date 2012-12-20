@@ -1,6 +1,9 @@
-CC = gcc -Wall -g
+CC = gcc -std=c89 -Wall -g
 
 all: test_tokenizer test_parser
+
+run: all
+	./test_tokenizer; ./test_parser
 
 test_tokenizer: test_tokenizer.o tml_tokenizer.o
 	$(CC) test_tokenizer.o tml_tokenizer.o -o test_tokenizer
@@ -18,4 +21,4 @@ test_tokenizer.o: test_tokenizer.c
 	$(CC) -c test_tokenizer.c
 
 clean:
-	rm -rf *.o test_tokenizer
+	rm -rf *.o test_tokenizer test_parser
