@@ -5,6 +5,9 @@
 
 int g_test_num = 0, g_pass_count = 0;
 
+#define PASS_MSG "pass"
+#define FAIL_MSG "[ F A I L ]"
+
 void test_tml(char *source_string, char *expected_output, bool brackets)
 {
 	struct tml_data *data = tml_parse_string(source_string);
@@ -17,16 +20,18 @@ void test_tml(char *source_string, char *expected_output, bool brackets)
 
 	if (expected_output == NULL) {
 		if (err) {
-			printf("PASS\n");
+			printf("%s\n", PASS_MSG);
 			g_pass_count++;
 		}
 		else
-			printf("FAIL: Expected error.\n");
+			printf("%s: Expected error.\n", FAIL_MSG);
+		tml_free_data(data);
 		return;
 	}
 
 	if (err) {
-		printf("FAIL: Unexpected parse error: \"%s\"\n", err);
+		printf("%s: Unexpected parse error: \"%s\"\n", FAIL_MSG, err);
+		tml_free_data(data);
 		return;
 	}
 
@@ -37,11 +42,11 @@ void test_tml(char *source_string, char *expected_output, bool brackets)
 		tml_node_to_string(&root, buff, 1024);
 
 	if (strcmp(buff, expected_output) == 0) {
-		printf("PASS\n");
+		printf("%s\n", PASS_MSG);
 		g_pass_count++;
 	}
 	else {
-		printf("FAIL: Produced \"%s\", expected \"%s\".\n", buff, expected_output);
+		printf("%s: Produced \"%s\", expected \"%s\".\n", FAIL_MSG, buff, expected_output);
 	}
 
 	tml_free_data(data);	
@@ -76,26 +81,50 @@ void test_node_to_string(const char *parse_str, const char *test_str, bool brack
 			size = tml_node_to_string(&root, buff, i+1);
 
 		if (size != expected_size) {
-			printf("FAIL: Node to string conversion %d claimed size %ld, expected %ld.\n", i, size, expected_size);
+			printf("%s: Node to string conversion %d claimed size %ld, expected %ld.\n", FAIL_MSG, i, size, expected_size);
+			tml_free_data(data);
 			return;
 		}
 
 		for (j = 0; j < expected_size; ++j) {
 			if (buff[j] != test_str[j]) {
-				printf("FAIL: Node to string test failed - invalid string produced.\n");
+				printf("%s: Node to string test failed - invalid string produced.\n", FAIL_MSG);
+				tml_free_data(data);
 				return;
 			}
 		}
 		if (buff[expected_size] != '\0') {
-			printf("FAIL: Node to string test failed - invalid null termination string length.\n");
+			printf("%s: Node to string test failed - invalid null termination string length.\n", FAIL_MSG);
+			tml_free_data(data);
 			return;
 		}
 	}
 
-	printf("PASS\n");
+	printf("%s\n", PASS_MSG);
 	g_pass_count++;
 
 	tml_free_data(data);
+}
+
+void test_pattern_match(const char *candidate, const char *pattern, bool match)
+{
+	g_test_num++;
+	printf("#%d ", g_test_num);
+
+	struct tml_data *c_data = tml_parse_string(candidate);
+	struct tml_data *p_data = tml_parse_string(pattern);
+
+	bool actual_match = tml_compare_nodes(tml_data_root_ptr(c_data), tml_data_root_ptr(p_data));
+	if (actual_match == match) {
+		printf("%s\n", PASS_MSG);
+		g_pass_count++;
+	}
+	else {
+		printf("%s\n", FAIL_MSG);
+	}
+
+	tml_free_data(c_data);
+	tml_free_data(p_data);
 }
 
 void print_report()
@@ -109,6 +138,7 @@ int main(void)
 	printf("\n==== TML Parser Test Suite ====\n\n");
 
 	/* test errors */
+	test_tml("", NULL, true);
 	test_tml("must-begin-with-a-list", NULL, true);
 	test_tml("[only one root] [node is allowed]", NULL, true);
 	test_tml("only one root node is allowed", NULL, true);
@@ -161,6 +191,49 @@ int main(void)
 	test_node_to_string("[[a]]", "a", false);
 	test_node_to_string("[[a] [b]]", "a b", false);
 	test_node_to_string("[a [b [c] d] e]", "a b c d e", false);
+
+	/* test pattern matching */
+	test_pattern_match("[]", "[]", true);
+	test_pattern_match("[|]", "[[][]]", true);
+	test_pattern_match("[a b c]", "[a b c]", true);
+	test_pattern_match("[a [b] c]", "[a [b] c]", true);
+
+	test_pattern_match("[|]", "[]", false);
+	test_pattern_match("[a b c]", "[a b c d]", false);
+	test_pattern_match("[a b c d]", "[a b c]", false);
+	test_pattern_match("[a b c]", "[c b a]", false);
+	test_pattern_match("[a b c]", "[a b d]", false);
+	test_pattern_match("[c a b]", "[d a b]", false);
+
+	test_pattern_match("[]", "[\\*]", true);
+	test_pattern_match("[a]", "[\\*]", true);
+	test_pattern_match("[a b c]", "[\\*]", true);
+	test_pattern_match("[[a] [b c]]", "[\\*]", true);
+
+	test_pattern_match("[]", "[\\? \\*]", false);
+	test_pattern_match("[a b]", "[\\? \\*]", true);
+	test_pattern_match("[a b]", "[\\? \\? \\*]", true);
+	test_pattern_match("[a b c]", "[\\? \\? \\*]", true);
+	test_pattern_match("[a b c]", "[\\? \\*]", true);
+	test_pattern_match("[a b c d]", "[\\? \\*]", true);
+	test_pattern_match("[[]]", "[\\?]", true);
+
+	test_pattern_match("[this is tml]", "[this is \\?]", true);
+	test_pattern_match("[this is tml]", "[this \\? tml]", true);
+	test_pattern_match("[this is tml]", "[\\? is tml]", true);
+	test_pattern_match("[this is tml]", "[\\? is \\?]", true);
+
+	test_pattern_match("[test is tml]", "[this is \\?]", false);
+	test_pattern_match("[test is tml]", "[this \\? tml]", false);
+
+	test_pattern_match("[[a b] [c d] [e f]]", "[[\\? b] [c \\?] [\\? f]]", true);
+	test_pattern_match("[[a b] [c d] [e f]]", "[ \\? \\? | \\? \\? | \\? \\? ]", true);
+	test_pattern_match("[[a b] [c d] [e f]]", "[[\\*] [\\? \\*] [\\? \\? \\*]]", true);
+
+	test_pattern_match("[bold | hello, this is a test!]", "[bold|\\*]", true);
+	test_pattern_match("[bold | hello, this is a test!]", "[italic|\\*]", false);
+	test_pattern_match("[bold | hello, [italic | this] is a test!]", "[bold|\\*]", true);
+
 
 	print_report();
 

@@ -10,10 +10,6 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#define TML_OPEN_CHAR '['
-#define TML_CLOSE_CHAR ']'
-#define TML_DIVIDER_CHAR '|'
-
 void stream_memzero(struct tml_stream *stream)
 {
 	memset(stream, 0, sizeof(*stream));
@@ -62,8 +58,8 @@ char translate_escape_code(char code)
 		case 't': return '\t';
 		case 's': return ' ';
 		/* special wildcard codes for pattern-match strings */
-		case '?': return 1; 
-		case '*': return 2;
+		case '?': return (char)TML_WILD_ONE; 
+		case '*': return (char)TML_WILD_ANY;
 	default:
 		return code;
 	}

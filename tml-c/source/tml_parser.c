@@ -33,6 +33,8 @@ size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool pr
 #define FULL_NODE_DATA_FLAG 0xFF
 const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
 
+struct tml_node NULL_NODE = { 0, 0, 0, "" };
+
 
 /* returns false if out of memory */
 void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
@@ -155,15 +157,21 @@ void set_parse_error(struct tml_data *data, const char *error_msg)
 		data->error_msg = error_msg;
 }
 
-const char *tml_parse_error(struct tml_data *data)
+const char *tml_parse_error(const struct tml_data *data)
 {
 	return data->error_msg;
 }
 
-struct tml_node tml_data_root(struct tml_data *data)
+struct tml_node tml_data_root(const struct tml_data *data)
 {
 	return data->root_node;
 }
+
+const struct tml_node *tml_data_root_ptr(const struct tml_data *data)
+{
+	return &data->root_node;
+}
+
 
 
 void write_packed_node(struct tml_data *data, const char *str, int str_len, int sibling_offset)
@@ -256,6 +264,7 @@ void parse_root(struct tml_data *data, struct tml_stream *tokens)
 			set_parse_error(data, "File contents is empty");
 		else
 			set_parse_error(data, "Expecting opening bracket at start of file");
+		data->root_node = NULL_NODE;
 		return;
 	}
 
@@ -397,8 +406,6 @@ size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool pr
 
 /* --------------- NODE ITERATION FUNCTIONS -------------------- */
 
-struct tml_node NULL_NODE = { 0, 0, 0, 0 };
-
 struct tml_node read_node(char *buff, char *ptr)
 {
 	struct tml_node node;
@@ -425,7 +432,7 @@ struct tml_node read_node(char *buff, char *ptr)
 	return node;
 }
 
-struct tml_node tml_next_sibling(struct tml_node *node)
+struct tml_node tml_next_sibling(const struct tml_node *node)
 {
 	if (node->next_sibling)
 		return read_node(node->buff, node->buff + node->next_sibling);
@@ -433,7 +440,7 @@ struct tml_node tml_next_sibling(struct tml_node *node)
 		return NULL_NODE;
 }
 
-struct tml_node tml_first_child(struct tml_node *node)
+struct tml_node tml_first_child(const struct tml_node *node)
 {
 	if (node->first_child)
 		return read_node(node->buff, node->buff + node->first_child);
@@ -441,22 +448,22 @@ struct tml_node tml_first_child(struct tml_node *node)
 		return NULL_NODE;
 }
 
-int tml_child_count(struct tml_node *node)
+int tml_child_count(const struct tml_node *node)
 {
 	int count = 0;
 	struct tml_node cnode = tml_first_child(node);
-	while (!tml_is_node_null(&cnode)) {
+	while (!tml_is_null(&cnode)) {
 		count++;
 		cnode = tml_next_sibling(&cnode);
 	}
 	return count;
 }
 
-struct tml_node tml_child_at_index(struct tml_node *node, int child_index)
+struct tml_node tml_child_at_index(const struct tml_node *node, int child_index)
 {
 	int count = 0;
 	struct tml_node cnode = tml_first_child(node);
-	while (!tml_is_node_null(&cnode)) {
+	while (!tml_is_null(&cnode)) {
 		if (count == child_index)
 			return cnode;
 		count++;
@@ -465,29 +472,39 @@ struct tml_node tml_child_at_index(struct tml_node *node, int child_index)
 	return NULL_NODE;
 }
 
-bool tml_is_node_null(struct tml_node *node)
+bool tml_is_null(const struct tml_node *node)
 {
 	return node->buff == 0;
 }
 
-bool tml_is_node_leaf(struct tml_node *node)
+bool tml_has_children(const struct tml_node *node)
 {
-	return node->first_child == 0;
+	return node->first_child != 0;
+}
+
+bool tml_is_list(const struct tml_node *node)
+{
+	return node->value[0] == '\0';
 }
 
 
-/* ------------------------------------ UTILITY FUNCTIONS ------------------------------------------------ */
 
-char *write_node_to_string(struct tml_node *node, char *dest_str, char *dest_end, bool write_brackets)
+/* --------------------------------- UTILITY FUNCTIONS (CONVERSION) -------------------------------- */
+
+char *write_node_to_string(const struct tml_node *node, char *dest_str, char *dest_end, bool write_brackets)
 {
 	if (dest_str >= dest_end-1)
 		return dest_str;
 
-	if (tml_is_node_leaf(node)) {
-		char *value = node->value;
+	if (!tml_has_children(node)) {
+		char *value;
+		size_t nodelen;
 
-		size_t nodelen = strlen(value);
-		if (nodelen == 0) {
+		if (!tml_is_list(node)) {
+			value = node->value;
+			nodelen = strlen(value);
+		}
+		else {
 			if (write_brackets) {
 				value = "[]";
 				nodelen = 2;
@@ -519,7 +536,7 @@ char *write_node_to_string(struct tml_node *node, char *dest_str, char *dest_end
 			dest_str = write_node_to_string(&s_node, dest_str, dest_end, write_brackets);
 
 			s_node = tml_next_sibling(&s_node);
-			if (tml_is_node_null(&s_node))
+			if (tml_is_null(&s_node))
 				break;
 
 			if (dest_str >= dest_end-1)
@@ -537,7 +554,7 @@ char *write_node_to_string(struct tml_node *node, char *dest_str, char *dest_end
 	}
 }
 
-size_t tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str_size)
+size_t tml_node_to_string(const struct tml_node *node, char *dest_str, size_t dest_str_size)
 {
 	char *str = write_node_to_string(node, dest_str, dest_str + dest_str_size, false);
 	size_t result_size = str - dest_str;
@@ -551,7 +568,7 @@ size_t tml_node_to_string(struct tml_node *node, char *dest_str, size_t dest_str
 	}
 }
 
-size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t dest_str_size)
+size_t tml_node_to_markup_string(const struct tml_node *node, char *dest_str, size_t dest_str_size)
 {
 	char *str = write_node_to_string(node, dest_str, dest_str + dest_str_size, true);
 	size_t result_size = str - dest_str;
@@ -565,7 +582,7 @@ size_t tml_node_to_markup_string(struct tml_node *node, char *dest_str, size_t d
 	}
 }
 
-double tml_node_to_double(struct tml_node *node)
+double tml_node_to_double(const struct tml_node *node)
 {
 	if (node->value && node->value[0] != 0) {
 		return atof(node->value);
@@ -573,17 +590,115 @@ double tml_node_to_double(struct tml_node *node)
 	else return 0;
 }
 
-float tml_node_to_float(struct tml_node *node)
+float tml_node_to_float(const struct tml_node *node)
 {
 	return tml_node_to_double(node);
 }
 
-int tml_node_to_int(struct tml_node *node)
+int tml_node_to_int(const struct tml_node *node)
 {
 	if (node->value && node->value[0] != 0) {
 		return atoi(node->value);
 	}
 	else return 0;
 }
+
+
+/* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */
+
+enum TML_WILDCARD check_wildcard(char *value)
+{
+	/* special string with ASCII character #1 and #2 are \? and \* wildcards */
+	if (value[0] == '\0')
+		return TML_NO_WILDCARD;
+	if (value[1] == '\0' && (value[0] == 1 || value[0] == 2))
+		return (enum TML_WILDCARD)value[0];
+	else
+		return TML_NO_WILDCARD;
+}
+
+bool tml_compare_nodes(const struct tml_node *candidate, const struct tml_node *pattern)
+{
+	if (!tml_is_list(pattern)) {
+		/* expecting a "word" leaf node */
+		if (tml_is_list(candidate)) return false;
+		else return (strcmp(candidate->value, pattern->value) == 0);
+	}
+	else {
+		struct tml_node p_child, c_child;
+		enum TML_WILDCARD wild;
+
+		/* at this point, we're expecting a list of zero or more items */
+		if (!tml_is_list(candidate)) {
+			return false;
+		}
+
+		/* if the pattern is an empty list [], then expect the same of the candidate */
+		if (!tml_has_children(pattern)) {
+			return !tml_has_children(candidate);
+		}
+
+		/* at this point, we're expecting a list of one or more items, so compare each element */
+
+		/* if the pattern list starts with a \* wildcard, match anything, even an empty candidate list */
+		p_child = tml_first_child(pattern);
+		wild = check_wildcard(p_child.value);
+		if (wild == TML_WILD_ANY)
+			return true;
+		c_child = tml_first_child(candidate);
+
+		while (!tml_is_null(&c_child) && !tml_is_null(&p_child)) {
+			/* the \? wildcard will match any single node, otherwise the node must be compared */
+			if (wild != TML_WILD_ONE) {
+				if (!tml_compare_nodes(&c_child, &p_child))
+					return false;
+			}
+
+			/* a following \* wildcard matches the remainder of the list, regardless of what it is */
+			p_child = tml_next_sibling(&p_child);
+			wild = check_wildcard(p_child.value);
+			if (wild == TML_WILD_ANY)
+				return true;
+
+			c_child = tml_next_sibling(&c_child);
+		}
+
+		/* if the candidate or pattern ran out of nodes before the other, they don't match */
+		if (!tml_is_null(&c_child) || !tml_is_null(&p_child)) {
+			return false;
+		}
+
+		/* everything seems to match */
+		return true;
+	}
+}
+
+struct tml_node tml_find_first_child(const struct tml_node *node, const struct tml_node *pattern)
+{
+	struct tml_node child = tml_first_child(node);
+
+	while (!tml_is_null(&child)) {
+		if (tml_compare_nodes(&child, pattern))
+			return child;
+		child = tml_next_sibling(&child);
+	}
+
+	return NULL_NODE;
+}
+
+struct tml_node tml_find_next_sibling(const struct tml_node *node, const struct tml_node *pattern)
+{
+	struct tml_node sib = tml_next_sibling(node);
+
+	while (!tml_is_null(&sib)) {
+		if (tml_compare_nodes(&sib, pattern))
+			return sib;
+		sib = tml_next_sibling(&sib);
+	}
+
+	return NULL_NODE;
+}
+
+
 
 

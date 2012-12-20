@@ -29,6 +29,24 @@
 
 #include <ctype.h>
 
+
+/* If you don't like TML's choice of brackets, feel free to change these to whatever
+ * characters you want to represent the list open, list close, and nesting divider symbols. */
+#define TML_OPEN_CHAR '['
+#define TML_CLOSE_CHAR ']'
+#define TML_DIVIDER_CHAR '|'
+
+/* This defines what escape codes "\?" and "\*" resolve to. There shouldn't be any
+ * reason to change this. these escape codes are used to represent wildcards, used 
+ * by the parser's pattern matching utility function. */
+enum TML_WILDCARD
+{
+	TML_NO_WILDCARD = 0,
+	TML_WILD_ONE = 1, /* ascii code for "\?" escape code */
+	TML_WILD_ANY = 2 /* ascii code for "\*" escape code */
+};
+
+
 struct tml_stream
 {
 	char *data;
@@ -50,6 +68,7 @@ struct tml_token
 
 	size_t offset;
 };
+
 
 /* Call tml_stream_open() to setup a stream to start reading tokens from. Pass this function
  * a memory buffer containing the ASCII TML text data to parse. You retain ownership of the 

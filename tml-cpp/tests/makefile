@@ -15,7 +15,7 @@ tml_tokenizer.o: ../../tml-c/source/tml_tokenizer.c ../../tml-c/source/tml_token
 tml_parser.o: ../../tml-c/source/tml_parser.c ../../tml-c/source/tml_parser.h
 	$(CC) -c ../../tml-c/source/tml_parser.c
 
-test_tml.o: test_tml.cpp
+test_tml.o: test_tml.cpp ../source/tml.hpp
 	$(CCP) -c test_tml.cpp
 
 clean:

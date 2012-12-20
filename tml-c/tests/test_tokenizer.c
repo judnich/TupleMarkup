@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define PASS_MSG "pass"
+#define FAIL_MSG "[ F A I L ]"
+
 struct tml_stream *create_stream(const char *text)
 {
 	struct tml_stream *stream = malloc(sizeof(*stream));
@@ -75,11 +78,11 @@ void test_parser(char *str_to_parse, char *str_to_verify)
 	print_stream(buff, stream);
 	
 	if (strcmp(buff, str_to_verify) == 0) {
-		printf("PASS\n");
+		printf("%s\n", PASS_MSG);
 		g_pass_count++;
 	}
 	else {
-		printf("FAIL: Produced \"%s\". Expected \"%s\".\n", buff, str_to_verify);
+		printf("%s: Produced \"%s\". Expected \"%s\".\n", FAIL_MSG, buff, str_to_verify);
 	}
 
 	destroy_stream(stream);

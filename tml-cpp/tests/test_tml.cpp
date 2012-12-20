@@ -11,26 +11,27 @@ int main(void)
 	cout << "  the C++ wrapper works correctly. For more comprehensive unit tests, refer" << endl;
 	cout << "  to the C implementation's tests (located in 'tml-c/tests')." << endl << endl;
 
-	string str = "[ position | 0.1 9.8 2.55 ]";
+	string str = "[ [color|red] [position | 0.1 9.8 2.55] ]";
 	cout << "Parsing \"" << str << "\"..." << endl;
 
 	TmlData *data = TmlData::parseString(str);
-
 	TmlNode root = data->getRoot();
 
-	TmlNode titleNode = root.getChildAtIndex(0);
-	string title = titleNode.toString();
+	TmlNode positionNode = root.findFirstChild("[position | \\? \\? \\?]");
 
-	TmlNode positionNode = root.getChildAtIndex(1);
+	TmlNode posData = positionNode.getChildAtIndex(1);
 
-	TmlNode element = positionNode.getFirstChild();
+	TmlNode element = posData.getFirstChild();
 	double xPos = element.toDouble();
+
 	element = element.getNextSibling();
 	double yPos = element.toDouble();
+	
 	element = element.getNextSibling();
 	double zPos = element.toDouble();
 
-	cout << "The parsed \"" << title << "\" is (x=" << xPos << ", y=" << yPos << ", z=" << zPos << ")." << endl;
+	cout << "The parsed \"" << positionNode.getChildAtIndex(0).toString()
+		<< "\" is (x=" << xPos << ", y=" << yPos << ", z=" << zPos << ")." << endl;
 
 	cout << endl;
 
