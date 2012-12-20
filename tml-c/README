@@ -20,8 +20,7 @@ What's in this folder?
 	no heap allocation at all.
 
 	It should be compatible with any C89 compiler (C89 was used in favor of
-	C99 only to maximize compatibility). Unicode should work fine as long
-	as you use UTF8.
+	C99 only to maximize compatibility). The parser supports ASCII or UTF8 input.
 
 Installation
 
