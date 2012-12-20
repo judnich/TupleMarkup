@@ -62,7 +62,8 @@ struct tml_data *tml_parse_memory(const char *buff, size_t buff_size);
  * delete the "buff" data right after calling this. */
 struct tml_data *tml_parse_in_memory(char *buff, size_t buff_size);
 
-/* Call this to destroy a tml_data object (do NOT just use free() on a tml_data* object) */
+/* Call this to destroy a tml_data object (do NOT just use free() on a tml_data* object) 
+ * Warning: Once you call this, all tml_node values derived from this data object will be invalidated. */
 void tml_free_data(struct tml_data *data);
 
 /* Returns an error description string if a parse error occurred, or NULL if no errors */

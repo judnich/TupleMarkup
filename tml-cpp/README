@@ -1,0 +1,19 @@
+What is TML?
+
+	TML (Tuple Markup Language)
+	github.com/judnich/TupleMarkup
+
+	An extremely simple all-purpose markup language: nested lists with 
+	bracket-minimizing syntax. It enables JSON-like and XML-like semantics 
+	within the same clean and consistent language, plus much more.
+
+
+What's in this folder? 
+
+	This folder contains a TML parser API in C++.
+
+	The parser itself is implemented in C (in the "tml-c" folder); this is just a
+	simple C++ wrapper around the C functions, providing a more convenient
+	interface for C++ programs (using std::string, RIAA, etc.) 
+
+	You can execute "make run" from the tests/ folder to try it out.
