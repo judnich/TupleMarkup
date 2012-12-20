@@ -44,16 +44,25 @@ struct tml_data
 
 /* --------------- DATA PARSE FUNCTIONS -------------------- */
 
-/* Create a new tml_data object, parsing from TML text contained within the given memory buffer. */
-struct tml_data *tml_parse_memory(char *buff, size_t buff_size);
-
 /* Create a new tml_data object, parsing from TML text contained within the given C string. */
-struct tml_data *tml_parse_string(char *str);
+struct tml_data *tml_parse_string(const char *str);
 
 /* Create a new tml_data object, parsing from TML text from the file specified (by filename). */
-struct tml_data *tml_parse_file(char *filename);
+struct tml_data *tml_parse_file(const char *filename);
 
-/* Call this to destroy a tml_data object. */
+/* Create a new tml_data object, parsing from TML text contained within the given memory buffer.
+ * The parsing procedure allocates its own memory for parsed data, so you can delete your "buff"
+ * data right after calling this if you want. */
+struct tml_data *tml_parse_memory(const char *buff, size_t buff_size);
+
+/* Create a new tml_data object, parsing from TML text contained within the given memory buffer,
+ * using the given memory buffer as a parser working space to conserve memory (less malloc's). This 
+ * means that your "buff" data may be modified by the parsing process, so consider the data invalidated 
+ * after calling this. The parsing procedure creates its own internal memory for parsed data, so you can
+ * delete the "buff" data right after calling this. */
+struct tml_data *tml_parse_in_memory(char *buff, size_t buff_size);
+
+/* Call this to destroy a tml_data object (do NOT just use free() on a tml_data* object) */
 void tml_free_data(struct tml_data *data);
 
 /* Returns an error description string if a parse error occurred, or NULL if no errors */

@@ -58,7 +58,7 @@ void shrink_buffer(struct tml_data *data)
 }
 
 
-struct tml_data *tml_parse_memory(char *ibuff, size_t ibuff_size)
+struct tml_data *tml_parse_in_memory(char *ibuff, size_t ibuff_size)
 {
 	struct tml_data *data = malloc(sizeof(*data));
 	if (!data) return NULL;
@@ -92,13 +92,23 @@ struct tml_data *tml_parse_memory(char *ibuff, size_t ibuff_size)
 	return data;
 }
 
-struct tml_data *tml_parse_string(char *str)
+struct tml_data *tml_parse_memory(const char *ibuff, size_t ibuff_size)
+{
+	char *ibuff_copy = malloc(ibuff_size);
+	if (!ibuff_copy) return NULL;
+	memcpy(ibuff_copy, ibuff, ibuff_size);
+	struct tml_data *data = tml_parse_in_memory(ibuff_copy, ibuff_size);
+	free(ibuff_copy);
+	return data;
+}
+
+struct tml_data *tml_parse_string(const char *str)
 {
 	size_t len = strlen(str);
 	return tml_parse_memory(str, len);
 }
 
-struct tml_data *tml_parse_file(char *filename)
+struct tml_data *tml_parse_file(const char *filename)
 {
 	long int fsize;
 
@@ -122,7 +132,7 @@ struct tml_data *tml_parse_file(char *filename)
 		return NULL;
 	}
 
-	struct tml_data *data = tml_parse_memory(buff, fsize);
+	struct tml_data *data = tml_parse_in_memory(buff, fsize);
 
 	fclose(fp);
 	free(buff);
@@ -499,10 +509,11 @@ char *write_node_to_string(struct tml_node *node, char *dest_str, char *dest_end
 	else {
 		struct tml_node s_node = tml_first_child(node);
 			
-		if (dest_str >= dest_end-1)
-			return dest_str;
-		if (write_brackets)
+		if (write_brackets) {
+			if (dest_str >= dest_end-1)
+				return dest_str;
 			*dest_str++ = '[';
+		}
 
 		for (;;) {
 			dest_str = write_node_to_string(&s_node, dest_str, dest_end, write_brackets);
@@ -516,10 +527,11 @@ char *write_node_to_string(struct tml_node *node, char *dest_str, char *dest_end
 			*dest_str++ = ' ';
 		}
 
-		if (dest_str >= dest_end-1)
-			return dest_str;
-		if (write_brackets)
+		if (write_brackets) {
+			if (dest_str >= dest_end-1)
+				return dest_str;
 			*dest_str++ = ']';
+		}
 
 		return dest_str;
 	}

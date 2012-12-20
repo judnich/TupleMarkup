@@ -97,6 +97,10 @@ int main(void)
 {
 	printf("\n==== TML Tokenizer Test Suite ====\n\n");
 
+	test_parser("a b c", "a b c  ||EOF");
+	test_parser("\\[", "[  ||EOF");
+	test_parser("\\]", "]  ||EOF");
+	test_parser("\\|", "|  ||EOF");
 	test_parser("[ [a|] || this is a comment\n b c |\n 1 2 3 ]", "[[a |]b c |1 2 3 ] ||EOF");
 	test_parser("[|[|[|[|[|!@#]]]]]", "[|[|[|[|[|!@# ]]]]] ||EOF");
 	test_parser("[|right\\[ stuff]", "[|right[ stuff ] ||EOF");
