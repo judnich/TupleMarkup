@@ -603,6 +603,48 @@ int tml_node_to_int(const struct tml_node *node)
 	else return 0;
 }
 
+int tml_node_to_float_array(const struct tml_node *node, float *array, int array_size)
+{
+	struct tml_node n = tml_first_child(node);
+	int count = 0;
+
+	while (!tml_is_null(&n)) {
+		if (count >= array_size) break;
+		array[count++] = tml_node_to_float(&n);
+		n = tml_next_sibling(&n);
+	}
+
+	return count;
+}
+
+int tml_node_to_double_array(const struct tml_node *node, double *array, int array_size)
+{
+	struct tml_node n = tml_first_child(node);
+	int count = 0;
+
+	while (!tml_is_null(&n)) {
+		if (count >= array_size) break;
+		array[count++] = tml_node_to_double(&n);
+		n = tml_next_sibling(&n);
+	}
+
+	return count;
+}
+
+int tml_node_to_int_array(const struct tml_node *node, int *array, int array_size)
+{
+	struct tml_node n = tml_first_child(node);
+	int count = 0;
+
+	while (!tml_is_null(&n)) {
+		if (count >= array_size) break;
+		array[count++] = tml_node_to_int(&n);
+		n = tml_next_sibling(&n);
+	}
+
+	return count;
+}
+
 
 /* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */
 

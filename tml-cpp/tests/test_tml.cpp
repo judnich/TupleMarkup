@@ -17,21 +17,15 @@ int main(void)
 	TmlData *data = TmlData::parseString(str);
 	TmlNode root = data->getRoot();
 
-	TmlNode positionNode = root.findFirstChild("[position | \\? \\? \\?]");
+	TmlNode positionNode = root.findFirstChild("[position | \\? \\? \\?]"); // returns [position | 0.1 9.8 2.55]
+	string nodeName = positionNode.getChildAtIndex(0).toString(); // returns "position"
 
-	TmlNode posData = positionNode.getChildAtIndex(1);
+	TmlNode posData = positionNode.getChildAtIndex(1); // returns [0.1 9.8 2.55]
 
-	TmlNode element = posData.getFirstChild();
-	double xPos = element.toDouble();
+	float vec[3];
+	posData.toFloatArray(vec, 3);
 
-	element = element.getNextSibling();
-	double yPos = element.toDouble();
-	
-	element = element.getNextSibling();
-	double zPos = element.toDouble();
-
-	cout << "The parsed \"" << positionNode.getChildAtIndex(0).toString()
-		<< "\" is (x=" << xPos << ", y=" << yPos << ", z=" << zPos << ")." << endl;
+	cout << "The parsed \"" << nodeName << "\" is (x=" << vec[0] << ", y=" << vec[1] << ", z=" << vec[2] << ")." << endl;
 
 	cout << endl;
 

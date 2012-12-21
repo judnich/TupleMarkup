@@ -109,11 +109,13 @@ bool tml_has_children(const struct tml_node *node); /* O(1) time */
  * is a list node without children (TML allows empty list expressions "[]"). */
 bool tml_is_list(const struct tml_node *node); /* O(1) time */
 
-/* Returns the number of children this node contains */
-int tml_child_count(const struct tml_node *node); /* O(n) time */
+/* Returns the number of children this node contains
+ * WARNING: This runs in O(n) time where n is the number of child nodes. */
+int tml_child_count(const struct tml_node *node);
 
-/* Returns the nth child of this node indexed by child_index (base 0) */
-struct tml_node tml_child_at_index(const struct tml_node *node, int child_index); /* O(n) time */
+/* Returns the nth child of this node indexed by child_index (base 0).
+ * WARNING: This runs in O(child_index) linear time.*/
+struct tml_node tml_child_at_index(const struct tml_node *node, int child_index);
 
 
 /* --------------- UTILITY FUNCTIONS (CONVERSION) -------------------- */
@@ -129,13 +131,25 @@ size_t tml_node_to_string(const struct tml_node *node, char *dest_str, size_t de
 size_t tml_node_to_markup_string(const struct tml_node *node, char *dest_str, size_t dest_str_size);
 
 /* Converts the contents of this node into an double value */
-double tml_node_to_double(const struct tml_node *node);
-
-/* Converts the contents of this node into an float value */
 float tml_node_to_float(const struct tml_node *node);
+
+/* Converts the contents of this node into an double value */
+double tml_node_to_double(const struct tml_node *node);
 
 /* Converts the contents of this node into an integer value */
 int tml_node_to_int(const struct tml_node *node);
+
+/* Reads a list of float values (e.g. "[0.2 1.5 0.8]") into the given float array,
+ * up to a maximum of array_size items. Returns the number of values read. */
+int tml_node_to_float_array(const struct tml_node *node, float *array, int array_size);
+
+/* Reads a list of double values (e.g. "[0.2 1.5 0.8]") into the given double array,
+ * up to a maximum of array_size items. Returns the number of values read. */
+int tml_node_to_double_array(const struct tml_node *node, double *array, int array_size);
+
+/* Reads a list of int values (e.g. "[1 2 3") into the given int array,
+ * up to a maximum of array_size items. Returns the number of values read. */
+int tml_node_to_int_array(const struct tml_node *node, int *array, int array_size);
 
 
 /* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */

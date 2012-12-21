@@ -5,6 +5,7 @@
  * This parser loads an entire TML file into memory very efficiently in both time and space.
  *
  * This C++ "implementation" of a TML parser is actually just a wrapper around the C implementation.
+ * Refer to the C implementation header ("tml-c/source/tml_parser.h") for detailed API documentation.
  */
 
 #pragma once
@@ -62,11 +63,13 @@ public:
 		return TmlNode( tml_next_sibling(&node) );
 	}
 
+	// WARNING: This runs in O(n) time where n is the number of child nodes.
 	int getChildCount() const
 	{
 		return tml_child_count(&node);
 	}
 
+	// WARNING: This runs in O(n) time where n is the number of child nodes.
 	TmlNode getChildAtIndex(int childIndex) const
 	{
 		return TmlNode( tml_child_at_index(&node, childIndex) );
@@ -99,6 +102,21 @@ public:
 	double toDouble() const
 	{
 		return tml_node_to_double(&node);
+	}
+
+	int toIntArray(int *array, int arraySize)
+	{
+		return tml_node_to_int_array(&node, array, arraySize);
+	}
+
+	int toFloatArray(float *array, int arraySize)
+	{
+		return tml_node_to_float_array(&node, array, arraySize);
+	}
+
+	int toDoubleArray(double *array, int arraySize)
+	{
+		return tml_node_to_double_array(&node, array, arraySize);
 	}
 
 	bool compareToPattern(const TmlNode &pattern) const
