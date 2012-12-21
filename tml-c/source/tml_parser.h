@@ -130,13 +130,13 @@ size_t tml_node_to_string(const struct tml_node *node, char *dest_str, size_t de
  * Returns the length of the resulting string. */
 size_t tml_node_to_markup_string(const struct tml_node *node, char *dest_str, size_t dest_str_size);
 
-/* Converts the contents of this node into an double value */
+/* Converts the value of this node into an double value. */
 float tml_node_to_float(const struct tml_node *node);
 
-/* Converts the contents of this node into an double value */
+/* Converts the value of this node into an double value */
 double tml_node_to_double(const struct tml_node *node);
 
-/* Converts the contents of this node into an integer value */
+/* Converts the value of this node into an integer value */
 int tml_node_to_int(const struct tml_node *node);
 
 /* Reads a list of float values (e.g. "[0.2 1.5 0.8]") into the given float array,
@@ -147,7 +147,7 @@ int tml_node_to_float_array(const struct tml_node *node, float *array, int array
  * up to a maximum of array_size items. Returns the number of values read. */
 int tml_node_to_double_array(const struct tml_node *node, double *array, int array_size);
 
-/* Reads a list of int values (e.g. "[1 2 3") into the given int array,
+/* Reads a list of int values (e.g. "[1 2 3]") into the given int array,
  * up to a maximum of array_size items. Returns the number of values read. */
 int tml_node_to_int_array(const struct tml_node *node, int *array, int array_size);
 
