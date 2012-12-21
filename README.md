@@ -7,7 +7,7 @@ It enables XML-like and JSON-like semantics within the same clean and consistent
 
 TML allows you to express human-readable data with a syntax much simpler and less cluttered than other general purpose markup/data languages. TML reserves only four symbols, yet is flexible enough to express an extremely wide range of data semantics.
 
-In contrast, many software engineers find XML to be overly verbose, complex, bulky, and irregular. Fun fact: The book "XML in a Nutshell" is **714** pages long.
+In contrast, many software engineers find XML to be overly verbose, irregular, complex, and bulky for most tasks. Fun fact: The book "XML in a Nutshell" is **714** pages long.
 
 * _"XML sometimes feels an awful lot like using an enormous sledgehammer to drive common household nails." - [Jeff Atwood](http://www.codinghorror.com/blog/2008/05/xml-the-angle-bracket-tax.html)_
 
