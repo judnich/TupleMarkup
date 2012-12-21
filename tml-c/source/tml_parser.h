@@ -209,12 +209,7 @@ bool tml_compare_nodes(const struct tml_node *candidate, const struct tml_node *
  * For example searching [1 2 [a 3] [a 4] 5] for the pattern [a \?] will return a node
  * pointing to the [a 3] node, because it's the first child that matches [c \?]. Then,
  * if you want to iterate to the next one "[a 4]", use tml_find_next_sibling.
- * See tml_compare_nodes() for more info on how pattern matching works. 
- * NOTE that this will NOT return node itself even if it matches the pattern. For example
- * if you tml_find_first_child() with node [a 4] and pattern [a \?], you'll get a NULL
- * node as a result because [a 4] does not contain any child node of the specified pattern.
- * If you want to check if a node itself matches a pattern (not its children), use
- * tml_compare_nodes(). */
+ * See tml_compare_nodes() for more info on how pattern matching works. */
 struct tml_node tml_find_first_child(const struct tml_node *node, const struct tml_node *pattern);
 
 /* Finds the next sibling after this node that matches the given pattern, if any.
