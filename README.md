@@ -1,13 +1,20 @@
 #Tuple Markup Language
 
 An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
-It enables JSON-like and XML-like semantics within the same clean and consistent language, plus much more.
+It enables XML-like and JSON-like semantics within the same clean and consistent language, plus much more.
 
-**Status:** _Complete parser/API implementations are availible in C and C++. As time permits, implementations in more languages (e.g. Google Go, Python, Ruby, Javascript, etc.) are planned._
+### Why TML?
+
+TML allows you to express human-readable data with a syntax much simpler and less cluttered than other general purpose markup/data languages. TML reserves only four symbols, yet is flexible enough to express an extremely wide range of data semantics.
+
+In contrast, many software engineers find XML to be overly verbose, complex, bulky, and irregular. Fun fact: The book "XML in a Nutshell" is **714** pages long.
+
+* _"XML sometimes feels an awful lot like using an enormous sledgehammer to drive common household nails." - [Jeff Atwood](http://www.codinghorror.com/blog/2008/05/xml-the-angle-bracket-tax.html)_
+
 
 ### What is in this repository?
 
-This repo contains TML parsers and query APIs implemented in a variety of languages. These allow your applications to quickly and easily access data from TML files. Refer to a TML parser implementation folder for examples and documentation on using TML data in your application.
+This repo contains TML parsers and query APIs implemented in a variety of languages. These allow your applications to quickly and easily access data from TML files. Refer to a TML parser implementation folder for examples and documentation on using TML data in your application. _Status: Complete parser/API implementations are availible in C and C++. Implementations in more languages (e.g. Google Go, Python, Ruby, Javascript, etc.) are planned, as time permits._
 
 
 ##TML Examples
