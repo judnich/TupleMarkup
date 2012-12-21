@@ -176,9 +176,9 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
  * The pattern [\? \*] expects one or more nodes, which accepts [a], [a b], [a b c], etc.
  * Pattern [\*] expects zero or more nodes. So this would match [], [a], [a b], [a b c], etc.
  *
- * Limitation: For performance and simplicity, you cannot write patterns with anything in
- * a list following the "\*" wildcard. For example [a b \*] is valid, but [\* a b] is not.
- * Similarly, [\? \*] is valid, but [\* \?] is not.
+ * Limitation: For simplicity (less ambiguity), pattern lists aren't allowed to have anything
+ * after a \* wildcard. In other words, patterns like "[a b \*]" are valid but "[\* a b]" are
+ * not. This limitation does not apply to "\?": patterns like "[\? a b]" are perfectly fine.
  *
  * Nested list patterns:
  * 
