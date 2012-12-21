@@ -4,7 +4,7 @@ An extremely simple all-purpose markup language: nested lists with bracket-minim
 
 ### Why TML?
 
-TML allows you to express human-readable data with a syntax much simpler and less cluttered than other general purpose markup/data languages. TML reserves only four symbols, yet is flexible enough to express an extremely wide range of data semantics.
+TML allows you to express human-readable data with a syntax much simpler and less cluttered than other all-purpose markup/data languages. TML reserves only four symbols, yet is flexible enough to express an extremely wide range of data semantics.
 
 In contrast, many software engineers find XML to be overly verbose, irregular, complex, and bulky for most tasks. Related fact: The book "XML in a Nutshell" is **714** pages long.
 
