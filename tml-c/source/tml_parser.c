@@ -36,7 +36,6 @@ const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
 struct tml_node NULL_NODE = { 0, 0, 0, "" };
 
 
-/* returns false if out of memory */
 void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 {
 	if (new_size >= TML_PARSER_MAX_DATA_SIZE) {
@@ -50,7 +49,6 @@ void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 	}
 }
 
-/* returns false if realloc somehow failed */
 void shrink_buffer(struct tml_data *data)
 {
 	if (data->buff) {
