@@ -3,7 +3,7 @@
 An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
 It enables JSON-like and XML-like semantics within the same clean and consistent language, plus much more.
 
-**NOTE:** _This project is very much a work-in-progress at the moment. While the language spec is mostly done, it still needs parser and read/write API implementations in as many languages as possible. Implementations in C, Javascript, and possibly Mozilla Rust, Google Go, and C++ are planned for the "official" release._
+**Status:** _The language spec is done, and parser/API implementations are availible in C and C++. Implementations in more languages (e.g. Google Go, Python, Ruby, Javascript) are planned to be completed eventually (since this is a spare-time hobby project)._
 
 ### What is in this repository?
 
