@@ -19,7 +19,7 @@ ignored, plus every character up to and including the next line-feed character.
 	syntax = grouped;
 
 	grouped = (open, list, close) | (open, list, divider, list, close) ;
-	list = {item}
+	list = {item} ;
 	item = grouped | word ;
 
 	open = {space}, "[", {space} ;
