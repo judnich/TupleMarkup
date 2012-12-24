@@ -4,7 +4,7 @@ What is TML?
 	github.com/judnich/TupleMarkup
 
 	An extremely simple all-purpose markup language: nested lists with 
-	bracket-minimizing syntax. It enables XML-like and JSON-like semantics 
+	bracket-minimizing syntax. It enables XML-like and YAML-like semantics 
 	within the same clean and consistent language.
 
 
