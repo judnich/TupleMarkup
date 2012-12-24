@@ -1,0 +1,169 @@
+
+<html>
+	<head>
+		<style>
+			body {
+				font-family: "courier new";
+				color: #fff;
+				background-color: #000;
+			}
+			.result { color: #fff; margin-bottom: 1em; }
+			.pass { color: #0f0; }
+			.fail { color: #f00; }
+		</style>
+	</head>
+
+	<body>
+		<script src="../source/tml.js"></script>
+
+		===== JavaScript TML Parser Test Suite ====<br/><br/>
+
+		<script>
+
+			var tcount = 0;
+
+			var showResult = function(passed, message) {
+				tcount++;
+				if (passed) {
+					document.write("<div class='pass'>#" + tcount + " PASSED</div>");
+				}
+				else {
+					document.write("<div class='fail'>#" + tcount + " FAILED:</div>");
+					document.write("<div class='result'>" + message + "</div>");
+				}
+			};
+
+			var test_tml = function(source, expected, brackets) {
+				try {
+					var tree = TML.parse(source);
+				}
+				catch (err) {
+					if (expected === null) {
+						showResult(true, "");
+						return;
+					}
+				}
+				if (expected === null) {
+					showResult(false, "Expected parse error for \"" + source + "\"");
+					return;
+				}
+
+				var result;
+				if (brackets)
+					result = TML.toMarkupString(tree);
+				else
+					result = TML.toString(tree);
+
+				showResult(result === expected, "Source \"" + source + "\", result \"" + result + "\"");
+			};
+
+			var test_pattern_match = function(candidate, pattern, matchExpected) {
+				var cTree = TML.parse(candidate);
+				var pTree = TML.parse(pattern);
+				var match = TML.compare(cTree, pTree);
+				showResult(
+							match == matchExpected, 
+							TML.toMarkupString(cTree) + "<br/>" + TML.toMarkupString(pTree)
+					);
+			};
+
+
+			/* test errors */
+			var NULL = null;
+
+			test_tml("[\\*]", "[\\*]", true);
+			test_tml("[\\?]", "[\\?]", true);
+			test_tml("[a\\[b]", "[a[b]", true);
+
+			test_tml("", NULL, true);
+			test_tml("must-begin-with-a-list", NULL, true);
+			test_tml("[only one root] [node is allowed]", NULL, true);
+			test_tml("only one root node is allowed", NULL, true);
+			test_tml("[forgot to [close | my] bracket", NULL, true);
+			test_tml("a b", NULL, true);
+			test_tml("[", NULL, true);
+			test_tml("[[]", NULL, true);
+			test_tml("]", NULL, true);
+			test_tml("|", NULL, true);
+			test_tml("[|", NULL, true);
+			test_tml("[|[a b]|", NULL, true);
+			test_tml("[a b", NULL, true);
+
+			/* test string conversion */
+			test_tml("[]", "", false);
+			test_tml("[test]", "test", false);
+			test_tml("[this [is [a [test]]]]", "this is a test", false);
+
+			test_tml("[bold | hello [italic | this] is a test]",
+				"bold hello italic this is a test", false);
+
+			/* test tml code parsing / generation */
+			test_tml("[]", "[]", true);
+			test_tml("[test]", "[test]", true);
+
+			test_tml("[|]", "[[] []]", true);
+			test_tml("[a|]", "[[a] []]", true);
+			test_tml("[|a]", "[[] [a]]", true);
+			test_tml("[| |]", "[[] [] []]", true);
+
+			test_tml("[a b c]", "[a b c]", true);
+			test_tml("[a [] b]", "[a [] b]", true);
+			test_tml("[[[]]]", "[[[]]]", true);
+			test_tml("[a b c | d e f]", "[[a b c] [d e f]]", true);
+			test_tml("[a | b | c | d | e]", "[[a] [b] [c] [d] [e]]", true);
+			
+			test_tml("[bold | hello [italic | this] is a test]",
+				"[[bold] [hello [[italic] [this]] is a test]]", true);
+
+			/* test pattern matching */
+			test_pattern_match("[]", "[]", true);
+			test_pattern_match("[|]", "[[][]]", true);
+			test_pattern_match("[a b c]", "[a b c]", true);
+			test_pattern_match("[a [b] c]", "[a [b] c]", true);
+
+			test_pattern_match("[|]", "[]", false);
+			test_pattern_match("[a b c]", "[a b c d]", false);
+			test_pattern_match("[a b c d]", "[a b c]", false);
+			test_pattern_match("[a b c]", "[c b a]", false);
+			test_pattern_match("[a b c]", "[a b d]", false);
+			test_pattern_match("[c a b]", "[d a b]", false);
+
+			test_pattern_match("[]", "[\\*]", true);
+			test_pattern_match("[a]", "[\\*]", true);
+			test_pattern_match("[a b c]", "[\\*]", true);
+			test_pattern_match("[[a] [b c]]", "[\\*]", true);
+
+			test_pattern_match("[]", "[\\? \\*]", false);
+			test_pattern_match("[a b]", "[\\? \\*]", true);
+			test_pattern_match("[a b]", "[\\? \\? \\*]", true);
+			test_pattern_match("[a b c]", "[\\? \\? \\*]", true);
+			test_pattern_match("[a b c]", "[\\? \\*]", true);
+			test_pattern_match("[a b c d]", "[\\? \\*]", true);
+			test_pattern_match("[[]]", "[\\?]", true);
+
+			test_pattern_match("[this is tml]", "[this is \\?]", true);
+			test_pattern_match("[this is tml]", "[this \\? tml]", true);
+			test_pattern_match("[this is tml]", "[\\? is tml]", true);
+			test_pattern_match("[this is tml]", "[\\? is \\?]", true);
+
+			test_pattern_match("[test is tml]", "[this is \\?]", false);
+			test_pattern_match("[test is tml]", "[this \\? tml]", false);
+
+			test_pattern_match("[[a b] [c d] [e f]]", "[[\\? b] [c \\?] [\\? f]]", true);
+			test_pattern_match("[[a b] [c d] [e f]]", "[ \\? \\? | \\? \\? | \\? \\? ]", true);
+			test_pattern_match("[[a b] [c d] [e f]]", "[[\\*] [\\? \\*] [\\? \\? \\*]]", true);
+
+			test_pattern_match("[bold | hello, this is a test!]", "[bold|\\*]", true);
+			test_pattern_match("[bold | hello, this is a test!]", "[italic|\\*]", false);
+			test_pattern_match("[bold | hello, [italic | this] is a test!]", "[bold|\\*]", true);
+
+		//	var tml = TML.parse("[this is a [bold | test]]");
+		//	var m = TML.find(tml, TML.parse("[bold | \\*]"));
+		//	document.write(TML.toMarkupString(m));
+
+			document.write("<br/>Unit tests all done!");
+
+		</script>
+	</body>
+
+</html>
