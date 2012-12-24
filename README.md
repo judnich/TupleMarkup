@@ -13,7 +13,7 @@ In contrast, many software engineers find XML to be overly verbose, irregular, c
 
 ### What is in this repository?
 
-This repo contains TML parsers and query APIs implemented in a variety of languages: C, C++, and Javascript. Implementations in more languages (e.g. Google Go, Python, Ruby, Javascript, etc.) are planned, as time permits. Refer to a TML parser implementation folder for examples and documentation on reading TML data in your application.
+This repo contains TML parsers and query APIs implemented in a variety of languages - currently: C, C++, and Javascript. Implementations in more languages (e.g. Google Go, Python, Ruby, Javascript, etc.) are planned, as time permits. Refer to a TML parser implementation folder for examples and documentation on reading TML data in your application.
 
 
 ##TML Examples
