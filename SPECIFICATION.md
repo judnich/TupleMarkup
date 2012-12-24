@@ -2,7 +2,8 @@
 
 TML is an extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
 
-This file provides a formal language specification for TML parser implementations.
+This file provides a formal language specification intended to guide TML parser implementations.
+It is NOT meant as a tutorial or manual for TML - refer to the main TML documentation for that.
 
 ### Line Comments
 
