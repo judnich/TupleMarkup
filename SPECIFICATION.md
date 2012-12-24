@@ -1,14 +1,12 @@
-#Tuple Markup Language Specification
-
-### What is TML?
+##Tuple Markup Language Specification
 
 TML is an extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
-It enables XML-like and YAML-like semantics within the same clean and consistent language, plus much more.
 
+This file provides a formal language specification for TML parser implementations.
 
 ### Line Comments
 
-Warning: Keep in mind the EBNF grammar below does not take `||` line comments
+Keep in mind the EBNF grammar below does not take `||` line comments
 into account. It's assumed that these will be removed as though by a preprocessor:
 Any character sequence `||` (excepting `\||`) found within the code should be
 ignored, plus every character up to and including the next line-feed character.
@@ -27,12 +25,27 @@ ignored, plus every character up to and including the next line-feed character.
 	divider = {space}, "|", {space} ;
 
 	word = word-char, {word-char} ;
-	word-char = "\s" | "\t" | "\r" | "\n" | "\[" | "\]" | "\|" | "\*" | "\?" | "\\"
+	word-char = "\s" | "\t" | "\r" | "\n" | "\[" | "\]" | "\|" | "\\" | "\*" | "\?"
 	          | (char - space - "[" - "]" - "|" - "\") ;
 
 	space = ? white space characters ? ;
 	char = ? all visible characters ? ;
 
+
+### Escape Codes
+
+Escape codes found within words should be converted to the appropriate UTF8/ASCII code they represent.
+
+* `\s` : space character.
+* `\t` : tab character.
+* `\r` : carriage return character.
+* `\n` : newline character.
+* `\[` : "[" character.
+* `\]` : "]" character.
+* `\|` : "|" character.
+* `\\` : "\" character.
+* `\?` : ASCII 0x01
+* `\*` : ASCII 0x02
 
 ### Informal Notes
 
