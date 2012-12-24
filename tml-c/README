@@ -32,6 +32,7 @@ What's in this folder?
 	This parser should be compatible with any C89 compiler (C89 was targeted in favor
 	of C99 only to maximize compatibility). The parser supports ASCII or UTF8 input.
 
+
 Installation
 
 	To run the included unit tests go to /tests and type "make run".
