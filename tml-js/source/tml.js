@@ -17,9 +17,9 @@ var TML = (function () {
 
     var convertIntermediateEscapeCodes = function (str) {
         var result = str.replace(/\\./g, function (code) {
-            if (code === "\\[") return collapsed_OpenBracket;
-            if (code === "\\]") return collapsed_CloseBracket;
-            if (code === "\\|") return collapsed_Divider;
+            if (code === "\\[") { return collapsed_OpenBracket; }
+            if (code === "\\]") { return collapsed_CloseBracket; }
+            if (code === "\\|") { return collapsed_Divider; }
             return code;
         });
         return result;
@@ -27,14 +27,14 @@ var TML = (function () {
 
     var convertFinalEscapeCodes = function (str) {
         var result = str.replace(/\\./g, function (code) {
-            if (code === collapsed_Divider) return "|";
-            if (code === collapsed_OpenBracket) return "[";
-            if (code === collapsed_Divider) return "]";
-            if (code === "\\s") return " ";
-            if (code === "\\t") return "\t";
-            if (code === "\\n") return "\n";
-            if (code === "\\r") return "\r";
-            if (code === "\\\\") return "\\";
+            if (code === collapsed_Divider) { return "|"; }
+            if (code === collapsed_OpenBracket) { return "["; }
+            if (code === collapsed_Divider) { return "]"; }
+            if (code === "\\s") { return " "; }
+            if (code === "\\t") { return "\t"; }
+            if (code === "\\n") { return "\n"; }
+            if (code === "\\r") { return "\r"; }
+            if (code === "\\\\") { return "\\"; }
             return code;
         });
         return result;
@@ -43,44 +43,47 @@ var TML = (function () {
     // Parses list "... ]" where the open bracket has already been read.
     // If endAtBar is true, this will let "|" terminate the list.
     var parseList = function (tokens, index, endAtBar) {
-        var tokLen = tokens.length;
-        var list = [];
-        var i = index;
+        var tokLen = tokens.length,
+            list = [],
+            i = index;
 
         while (i < tokLen) {
-            var tok = tokens[i++];
+            var tok = tokens[i++], ret;
 
             if (tok === "[") {
                 // append sublist
-                var ret = parseList(tokens, i);
+                ret = parseList(tokens, i);
                 i = ret.index;
                 list.push(ret.result);
-            } 
-            else if (tok === "|") {
-                if (endAtBar)
+
+            } else if (tok === "|") {
+                if (endAtBar) {
                     return {index: i, result: list};
+                }
 
                 // nest-ify
                 list = [list];
                 while (i < tokLen) {
-                    var ret = parseList(tokens, i, true);
+                    ret = parseList(tokens, i, true);
                     i = ret.index;
 
                     list.push(ret.result);
 
-                    if (tokens[i - 1] === "]")
+                    if (tokens[i - 1] === "]") {
                         return {index: i, result: list};
+                    }
                 }
                 break; // expected closing bracket, reached EOF
-            }
-            else if (tok === "]") {
+
+            } else if (tok === "]") {
                 // close this list
                 return {index: i, result: list};
-            }
-            else {
-                // append word
-                if (tok !== "")
+
+            } else {
+                // else, append word
+                if (tok !== "") {
                     list.push(convertFinalEscapeCodes(tok));
+                }
             }
         }
 
@@ -89,37 +92,42 @@ var TML = (function () {
 
     var parseRoot = function (tokens) {
         var tokLen = tokens.length;
-        if (tokLen === 0 || tokens[0] !== "[")
+        if (tokLen === 0 || tokens[0] !== "[") {
             throw "TML: Expected open bracket";
+        }
 
         var ret = parseList(tokens, 1, false);
         var tree = ret.result;
 
-        if (ret.index < tokLen)
+        if (ret.index < tokLen) {
             throw "TML: Expected end of file after root node";
+        }
 
         return tree;
     };
 
 
     var treeToStringGen = function (tmlTree, brackets) {
-        if (typeof tmlTree === "string") return tmlTree;
-
-        var len = tmlTree.length, str = "";
-        if (brackets) str = "[";
-
-        for (var i = 0; i < len; ++i) {
-            var v = tmlTree[i];
-
-            if (typeof(v) === "string")
-                str += v;
-            else
-                str += treeToStringGen(v, brackets);
-
-            if (i < len-1) str += " ";
+        if (typeof tmlTree === "string") {
+            return tmlTree;
         }
 
-        if (brackets) str += "]";
+        var len = tmlTree.length, str = "", i;
+        if (brackets) { str = "["; }
+
+        for (i = 0; i < len; ++i) {
+            var v = tmlTree[i];
+
+            if (typeof v === "string") {
+                str += v;
+            } else {
+                str += treeToStringGen(v, brackets);
+            }
+
+            if (i < len - 1) { str += " "; }
+        }
+
+        if (brackets) { str += "]"; }
         return str;
     };
 
@@ -147,28 +155,35 @@ var TML = (function () {
     // or more nodes up to the end of the list. NOTE: Both "candidate" and "pattern" are expected to be 
     // parsed data trees, i.e. results from TML.parse (or your own nested lists/strings if you want).
     me.compare = function (candidate, pattern) {
-        if (pattern === "\\?")
+        if (pattern === "\\?") {
             return true;
-        if (typeof candidate === "string")
+        }
+        if (typeof candidate === "string") {
             return (candidate === pattern);
-        if (typeof pattern === "string") 
+        }
+        if (typeof pattern === "string") {
             return false;
+        }
 
         var cLen = candidate.length, pLen = pattern.length, c;
+
         for (c = 0; c < cLen; ++c) {
-            if (c >= pLen) 
+            if (c >= pLen) {
                 return false;
-            if (pattern[c] === "\\*") 
+            }
+            if (pattern[c] === "\\*") {
                 return true;
-            if (!me.compare(candidate[c], pattern[c])) 
+            }
+            if (!me.compare(candidate[c], pattern[c])) {
                 return false;
+            }
         }
 
         if (c < pLen) {
-            if (pattern[c] === "\\*")
+            if (pattern[c] === "\\*") {
                 return true;
-            else
-                return false;
+            }
+            return false;
         }
 
         return true;
@@ -178,10 +193,11 @@ var TML = (function () {
     // Returns null if no match is found. NOTE: Both "node" and "pattern" are expected to be 
     // parsed data trees, i.e. results from TML.parse (or your own nested lists/strings if you want).
     me.find = function (node, pattern) {
-        var len = node.length;
-        for (var i = 0; i < len; ++i) {
-            if (me.compare(node[i], pattern))
+        var len = node.length, i;
+        for (i = 0; i < len; ++i) {
+            if (me.compare(node[i], pattern)) {
                 return node[i];
+            }
         }
         return null;
     };
@@ -190,11 +206,11 @@ var TML = (function () {
     // Returns [] if no match is found. NOTE: Both "node" and "pattern" are expected to be 
     // parsed data trees, i.e. results from TML.parse (or your own nested lists/strings if you want).
     me.findAll = function (node, pattern) {
-        var results = [];
-        var len = node.length;
-        for (var i = 0; i < len; ++i) {
-            if (me.compare(node[i], pattern))
+        var results = [], len = node.length, i;
+        for (i = 0; i < len; ++i) {
+            if (me.compare(node[i], pattern)) {
                 results.push(node[i]);
+            }
         }
         return results;
     };
