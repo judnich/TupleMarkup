@@ -144,7 +144,8 @@ var TML = (function () {
     // Compares a candidate TML tree against a given pattern. If the pattern contains no wildcards, this
     // simply compares the two trees and returns true if identical. Alternately, the pattern may contain 
     // the "\?" wildcard to match any node (any list or string), or the "\*" wildcard to match any zero
-    // or more nodes up to the end of the list.
+    // or more nodes up to the end of the list. NOTE: Both "candidate" and "pattern" are expected to be 
+    // parsed data trees, i.e. results from TML.parse (or your own nested lists/strings if you want).
     me.compare = function (candidate, pattern) {
         if (pattern === "\\?")
             return true;
@@ -174,7 +175,8 @@ var TML = (function () {
     };
 
     // Returns the first child under node which matches the given pattern (as determined by TML.compare).
-    // Returns null if no match is found.
+    // Returns null if no match is found. NOTE: Both "node" and "pattern" are expected to be 
+    // parsed data trees, i.e. results from TML.parse (or your own nested lists/strings if you want).
     me.find = function (node, pattern) {
         var len = node.length;
         for (var i = 0; i < len; ++i) {
@@ -185,7 +187,8 @@ var TML = (function () {
     };
 
     // Returns a list of all children under node which match the given pattern (as determined by TML.compare).
-    // Returns [] if no match is found.
+    // Returns [] if no match is found. NOTE: Both "node" and "pattern" are expected to be 
+    // parsed data trees, i.e. results from TML.parse (or your own nested lists/strings if you want).
     me.findAll = function (node, pattern) {
         var results = [];
         var len = node.length;
