@@ -10,35 +10,37 @@ What is TML?
 
 What's in this folder? 
 
-	This folder contains a TML parser API in JavaScript. Unit tests are included, which can
-	be run just by opening tests/test_tml.html
+	This folder contains a TML parser API in JavaScript. Unit tests are included, which
+	can be run by opening tests/test_tml.html
 
 	Parsing TML data in JavaScript is as simple as passing a TML string to TML.parse(), 
 	which returns the parsed data object.
 
-	Just as TML consists of nested lists and strings, the data object TML.parse() returns will
-	consist of nested JavaScript lists and strings. For example, parsing the TML string 
-	"[abc 123 [hello] xyz]" returns an object equivalent to the JavaScript literal: 
-	"['abc', '123', ['hello'], 'xyz']".
+	Just as TML consists of nested lists and strings, the object TML.parse() returns 
+	will consist of nested JavaScript lists and strings. For example, parsing the TML
+	string "[abc 123 [hello] xyz]" returns an object equivalent to the JavaScript
+	literal: "['abc', '123', ['hello'], 'xyz']".
 
 
 Notes regarding JSON
 
 	TML is *not* meant to replace JSON for automatic JavaScript object serialization.
 
-	As a subset of JavaScript, JSON is ideal for serialization of JavaScript application data.
-	Writing/reading JavaScript objects with JSON is automatic, because JSON *is* JavaScript.
+	As a subset of JavaScript, JSON is ideal for serialization of JavaScript application
+	data. Writing/reading JavaScript objects with JSON is automatic, because JSON is JS.
 
-	TML is more generic than JSON, aiming to provide an extremely clean intermediate human-readable
-	data format for a wider range of data semantics, languages, and applications.
+	TML is more generic than JSON, aiming to provide an extremely clean intermediate 
+	human-readable data format for a wider range of data semantics, languages, and 
+	applications.
 
-	Of course, TML can easily represent everything JSON does (key-value pairs, etc.), but since 
-	it can also represent many other things, this capability is not strictly hard-coded. As a 
-	result, plain TML won't give you the automatic 1:1 object serialization that formats designed
-	specifically for this (like JSON) do.
+	Of course, TML can easily represent everything JSON does (key-value pairs, etc.),
+	but since it can also represent many other things, this capability is not strictly
+	hard-coded. As a result, plain TML won't give you the automatic 1:1 object 
+	serialization that formats designed specifically for this (like JSON) do.
 
-	You usually have to write some custom behavior to load TML data values into the corresponding
-	parts of your application, since TML makes no assumptions here.
+	You usually have to write some custom behavior to load TML data values into the 
+	corresponding parts of your application, since TML makes no assumptions here.
 
-	In contrast, if you just want a quick-and-easy way of automatically writing and reading
-	JavaScript objects to/from streams, JSON is better because it's designed for this.
+	In contrast, if you just want a quick-and-easy way of automatically writing and 
+	reading JavaScript objects to/from streams, JSON is better because it's designed
+	for this.
