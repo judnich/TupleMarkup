@@ -42,6 +42,11 @@
 						showResult(true, "");
 						return;
 					}
+					else {
+						showResult(false, err);
+						throw err;
+						return;
+					}
 				}
 				if (expected === null) {
 					showResult(false, "Expected parse error for \"" + source + "\"");
