@@ -1,8 +1,8 @@
-#TML Specification
+#Tuple Markup Language Specification
 
 ### What is TML?
 
-An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
+TML is an extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
 It enables XML-like and YAML-like semantics within the same clean and consistent language, plus much more.
 
 
