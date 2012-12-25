@@ -1,13 +1,10 @@
-#include "tml_parser.h"
-#include "tml_tokenizer.h"
-
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-
-/*
- * Data is parsed and inserted into memory using a packed format to reduce the 
+/* 
+ * Copyright (C) 2012 John Judnich
+ * Released as open-source under The MIT Licence. 
+ *
+ * TML Parser - C Implementation
+ *
+ * Notes: Data is parsed and inserted into memory using a packed format to reduce the 
  * overhead that would otherwise be incurred by the tree linkings (~10 bytes per node).
  * This format compresses that down to only 1 byte overhead per node for leaf nodes.
  *
@@ -24,19 +21,32 @@
  * absolute offset followed by a first_child absolute offset.
  */
 
+#include "tml_parser.h"
+#include "tml_tokenizer.h"
 
-void set_parse_error(struct tml_data *data, const char *error_msg);
-void parse_root(struct tml_data *data, struct tml_stream *tokens);
-size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out);
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#ifdef _MSC_VER
+#define INLINE __inline
+#else
+#define INLINE __inline__
+#endif
+
+
+static void set_parse_error(struct tml_data *data, const char *error_msg);
+static void parse_root(struct tml_data *data, struct tml_stream *tokens);
+static size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out);
 
 
 #define FULL_NODE_DATA_FLAG 0xFF
-const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
+static const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
 
-struct tml_node NULL_NODE = { 0, 0, 0, "" };
+static struct tml_node NULL_NODE = { 0, 0, 0, "" };
 
 
-void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
+static void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 {
 	if (new_size >= TML_PARSER_MAX_DATA_SIZE) {
 		set_parse_error(data, 
@@ -49,7 +59,7 @@ void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 	}
 }
 
-void shrink_buffer(struct tml_data *data)
+static void shrink_buffer(struct tml_data *data)
 {
 	if (data->buff) {
 		data->buff_allocated = data->buff_index;
@@ -149,7 +159,7 @@ void tml_free_data(struct tml_data *data)
 	}
 }
 
-void set_parse_error(struct tml_data *data, const char *error_msg)
+static void set_parse_error(struct tml_data *data, const char *error_msg)
 {
 	if (data->error_msg == NULL)
 		data->error_msg = error_msg;
@@ -172,7 +182,7 @@ const struct tml_node *tml_data_root_ptr(const struct tml_data *data)
 
 
 
-void write_packed_node(struct tml_data *data, const char *str, int str_len, int sibling_offset)
+static void write_packed_node(struct tml_data *data, const char *str, int str_len, int sibling_offset)
 {
 	size_t index = data->buff_index;
 
@@ -198,7 +208,7 @@ void write_packed_node(struct tml_data *data, const char *str, int str_len, int 
 	data->buff_index = index;
 }
 
-size_t write_node(struct tml_data *data, const char *str, int str_len)
+static size_t write_node(struct tml_data *data, const char *str, int str_len)
 {
 	size_t index = data->buff_index;
 
@@ -227,25 +237,25 @@ size_t write_node(struct tml_data *data, const char *str, int str_len)
 	return ptr - data->buff;
 }
 
-__inline__ void update_node_child(char *node_ptr, size_t first_child)
+static __inline__ void update_node_child(char *node_ptr, size_t first_child)
 {
 	tml_offset_t *fc = (tml_offset_t*)(node_ptr + 1);
 	*fc = (tml_offset_t)first_child;
 }
 
-__inline__ void update_node_sibling(char *node_ptr, size_t next_sibling)
+static __inline__ void update_node_sibling(char *node_ptr, size_t next_sibling)
 {
 	tml_offset_t *ns = (tml_offset_t*)(node_ptr + 1 + sizeof(tml_offset_t));
 	*ns = (tml_offset_t)next_sibling;
 }
 
-__inline__ size_t get_node_child(char *node_ptr)
+static __inline__ size_t get_node_child(char *node_ptr)
 {
 	tml_offset_t *fc = (tml_offset_t*)(node_ptr + 1);
 	return *fc;
 }
 
-__inline__ size_t get_node_sibling(char *node_ptr)
+static __inline__ size_t get_node_sibling(char *node_ptr)
 {
 	tml_offset_t *ns = (tml_offset_t*)(node_ptr + 1 + sizeof(tml_offset_t));
 	return *ns;
@@ -253,7 +263,7 @@ __inline__ size_t get_node_sibling(char *node_ptr)
 
 
 /* Parses "[...]" */
-void parse_root(struct tml_data *data, struct tml_stream *tokens)
+static void parse_root(struct tml_data *data, struct tml_stream *tokens)
 {
 	struct tml_token token = tml_stream_pop(tokens);
 
@@ -288,7 +298,7 @@ void parse_root(struct tml_data *data, struct tml_stream *tokens)
 
 /* Parses "...]", a list where we assume that the opening brace has been read. 
  * After returning from this function, the stream will have read the closing brace. */
-size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out)
+static size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out)
 {
 	/* this is the container node for the list contents */
 	size_t root_node = write_node(data, NULL, 0);
@@ -404,7 +414,7 @@ size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool pr
 
 /* --------------- NODE ITERATION FUNCTIONS -------------------- */
 
-struct tml_node read_node(char *buff, char *ptr)
+static struct tml_node read_node(char *buff, char *ptr)
 {
 	struct tml_node node;
 	node.buff = buff;
@@ -489,7 +499,7 @@ bool tml_is_list(const struct tml_node *node)
 
 /* --------------------------------- UTILITY FUNCTIONS (CONVERSION) -------------------------------- */
 
-char *write_node_to_string(const struct tml_node *node, char *dest_str, char *dest_end, bool write_brackets)
+static char *write_node_to_string(const struct tml_node *node, char *dest_str, char *dest_end, bool write_brackets)
 {
 	if (dest_str >= dest_end-1)
 		return dest_str;
@@ -646,7 +656,7 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
 
 /* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */
 
-enum TML_WILDCARD check_wildcard(char *value)
+static enum TML_WILDCARD check_wildcard(char *value)
 {
 	/* special string with ASCII character #1 and #2 are \? and \* wildcards */
 	if (value[0] == '\0')

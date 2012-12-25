@@ -10,6 +10,13 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#ifdef _MSC_VER
+#define INLINE __inline
+#else
+#define INLINE __inline__
+#endif
+ 
+
 void stream_memzero(struct tml_stream *stream)
 {
 	memset(stream, 0, sizeof(*stream));
@@ -37,7 +44,7 @@ void tml_stream_close(struct tml_stream *stream)
 		stream_memzero(stream);
 }
 
-__inline__ int peek_char(struct tml_stream *stream, size_t offset)
+static INLINE int peek_char(struct tml_stream *stream, size_t offset)
 {
 	if (stream->index + offset < stream->data_size)
 		return stream->data[stream->index + offset];
@@ -45,7 +52,7 @@ __inline__ int peek_char(struct tml_stream *stream, size_t offset)
 		return -1;
 }
 
-__inline__ void next_char(struct tml_stream *stream)
+static INLINE void next_char(struct tml_stream *stream)
 {
 	stream->index++;
 }
