@@ -20,11 +20,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef _MSC_VER
+#define TML_INLINE __inline
+#else
+#define TML_INLINE __inline__
+#endif
+
+
 /* We use this typedef because 32 bit offset values are fine for any TML file under 4 GB.
  * If you need to load TML files over 4 GB into memory, then this can be changed larger. */
 typedef uint32_t tml_offset_t; 
 /* This should be kept consistent to be 2 to the power of sizeof(tml_offset_t) */
 #define TML_PARSER_MAX_DATA_SIZE 0xFFFF
+
 
 struct tml_node
 {
@@ -93,7 +101,10 @@ struct tml_node tml_first_child(const struct tml_node *node); /* O(1) time */
  * an iteration. Specifically, when tml_next_sibling() or tml_first_child() are called
  * but no appropriate successor exists, a "null" tml_node value is returned.
  * Use this function to determined whether that is a null node or not. */
-bool tml_is_null(const struct tml_node *node); /* O(1) time */
+static TML_INLINE bool tml_is_null(const struct tml_node *node)
+{
+	return node->buff == 0;
+}
 
 /* Returns true if this node contains one or more children.
  * Equivalent to !tml_is_null(tml_first_child(node)), but slightly faster.
@@ -101,13 +112,19 @@ bool tml_is_null(const struct tml_node *node); /* O(1) time */
  * where it's technically a list but has no children. So a node having no children
  * doesn't necessarily mean it's not a list. If you want to determine if something 
  * is a list, use tml_is_list() instead. */
-bool tml_has_children(const struct tml_node *node); /* O(1) time */
+static TML_INLINE bool tml_has_children(const struct tml_node *node)
+{
+	return node->first_child != 0;
+}
 
 /* Returns true if this node is a list of zero or more subnodes.
  * Equivalent to (strcmp(node->value,"")==0), because lists have no string value.
  * NOTE: A list node doesn't guarantee it will have a child. It's possible that a node
  * is a list node without children (TML allows empty list expressions "[]"). */
-bool tml_is_list(const struct tml_node *node); /* O(1) time */
+static TML_INLINE bool tml_is_list(const struct tml_node *node)
+{
+	return node->value[0] == '\0';
+}
 
 /* Returns the number of children this node contains
  * WARNING: This runs in O(n) time where n is the number of child nodes. */

@@ -28,12 +28,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifdef _MSC_VER
-#define INLINE __inline
-#else
-#define INLINE __inline__
-#endif
-
 
 static void set_parse_error(struct tml_data *data, const char *error_msg);
 static void parse_root(struct tml_data *data, struct tml_stream *tokens);
@@ -479,22 +473,6 @@ struct tml_node tml_child_at_index(const struct tml_node *node, int child_index)
 	}
 	return NULL_NODE;
 }
-
-bool tml_is_null(const struct tml_node *node)
-{
-	return node->buff == 0;
-}
-
-bool tml_has_children(const struct tml_node *node)
-{
-	return node->first_child != 0;
-}
-
-bool tml_is_list(const struct tml_node *node)
-{
-	return node->value[0] == '\0';
-}
-
 
 
 /* --------------------------------- UTILITY FUNCTIONS (CONVERSION) -------------------------------- */
