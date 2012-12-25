@@ -53,6 +53,13 @@ public:
 		return std::string(node.value);
 	}
 
+	// Slightly faster than getValue() due to no extra copy operation.
+	// Useful for iteration/comparisons, since you can compare C strings to C++ strings.
+	const char *getValueCstr() const
+	{
+		return node.value;
+	}
+
 	TmlNode getFirstChild() const
 	{
 		return TmlNode( tml_first_child(&node) );
@@ -78,8 +85,8 @@ public:
 	std::string toString() const
 	{
 		char buff[MAX_TML_STRING_SIZE];
-		tml_node_to_string(&node, buff, MAX_TML_STRING_SIZE);
-		return std::string(buff);
+		size_t len = tml_node_to_string(&node, buff, MAX_TML_STRING_SIZE);
+		return std::string(buff, len);
 	}
 
 	std::string toMarkupString() const
