@@ -30,8 +30,8 @@
 /* We use this typedef because 32 bit offset values are fine for any TML file under 4 GB.
  * If you need to load TML files over 4 GB into memory, then this can be changed larger. */
 typedef uint32_t tml_offset_t; 
-/* This should be kept consistent to be 2 to the power of sizeof(tml_offset_t) */
-#define TML_PARSER_MAX_DATA_SIZE 0xFFFF
+/* This should be kept consistent to be pow(2, sizeof(tml_offset_t))-1 */
+#define TML_PARSER_MAX_DATA_SIZE 0xFFFFFFFF
 
 
 struct tml_node
