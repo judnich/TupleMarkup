@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include <ctype.h>
 
 #ifdef _MSC_VER
 #define INLINE __inline
@@ -44,12 +43,10 @@ void tml_stream_close(struct tml_stream *stream)
 		stream_memzero(stream);
 }
 
-static INLINE int peek_char(struct tml_stream *stream, size_t offset)
+static INLINE int peek_char(struct tml_stream *stream)
 {
-	if (stream->index + offset < stream->data_size)
-		return stream->data[stream->index + offset];
-	else
-		return -1;
+	return (stream->index < stream->data_size) ? 
+			stream->data[stream->index] : -1 ;
 }
 
 static INLINE void next_char(struct tml_stream *stream)
@@ -83,9 +80,9 @@ struct tml_token tml_stream_pop(struct tml_stream *stream)
 	token.value_size = 0;
 
 	for (;;) {
-		int ch = peek_char(stream, 0);
+		int ch = peek_char(stream);
 
-		if (isspace(ch)) {
+		if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n') {
 			next_char(stream);
 			continue;
 		}
@@ -104,7 +101,7 @@ struct tml_token tml_stream_pop(struct tml_stream *stream)
 		}
 		else if (ch == TML_DIVIDER_CHAR) {
 			next_char(stream);
-			if (peek_char(stream, 0) == TML_DIVIDER_CHAR) {
+			if (peek_char(stream) == TML_DIVIDER_CHAR) {
 				skip_to_next_line(stream);
 				continue;
 			}
@@ -127,7 +124,7 @@ struct tml_token tml_stream_pop(struct tml_stream *stream)
 void skip_to_next_line(struct tml_stream *stream)
 {
 	for (;;) {
-		int ch = peek_char(stream, 0);
+		int ch = peek_char(stream);
 		next_char(stream);
 
 		if (ch == '\n' || ch == '\r' || ch == -1)
@@ -136,37 +133,37 @@ void skip_to_next_line(struct tml_stream *stream)
 }
 
 /* This function is a bit messy unfortunately since it does efficient in-place parsing of "words"
- * in such a way that no memory writes occur for words without escape codes. When escape codes are
- * encountered, it collapses them to the actual character value in-place in memory. In either case,
- * the token data generated from this operation points to word within the stream data memory. */
-void parse_word_item(struct tml_stream *stream, struct tml_token *token)
+ * with escape codes. When escape codes are encountered, it collapses them to the actual character 
+ * value in-place in memory. The token data generated from this operation points to the word within
+ * the stream data memory. */
+void parse_escaped_word_item(struct tml_stream *stream, struct tml_token *token)
 {
 	char *word_start = &stream->data[stream->index];
 	char *p = word_start;
 	bool shift_necessary = false;
 
 	/* scan the word, collapsing escape codes in-place if necessary */
-	int ch = peek_char(stream, 0);
-	while (!isspace(ch) && ch != -1 && 
+	int ch = peek_char(stream);
+	while (ch != ' ' && ch != '\t' && ch != -1 && 
 		ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
 	{
 		if (ch == '\\') {
 			/* substitute 2-character escape code with the character it represents */
 			next_char(stream);
-			ch = peek_char(stream, 0);
+			ch = peek_char(stream);
 			if (ch == -1) break;
 			*p = translate_escape_code(ch);
 			shift_necessary = true;
 		}
 		else if (shift_necessary) {
 			/* shift character to the left collapsed position */
-			*p = (ch = peek_char(stream, 0));
+			*p = (ch = peek_char(stream));
 		}
 
 		/* go on to the next potential character */
 		p++;
 		next_char(stream);
-		ch = peek_char(stream, 0);
+		ch = peek_char(stream);
 	}
 
 	/* return a reference to the data slice */
@@ -174,5 +171,46 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 	token->value = word_start;
 	token->value_size = (p - word_start);
 }
+
+/* This function reads in a word by quickly skimming to the end. This only works if it doesn't use escape
+ * codes - if it bumps into one, it reverts to parse_escaped_word_item() to do the job. */
+void parse_word_item(struct tml_stream *stream, struct tml_token *token)
+{
+	char *word_start = &stream->data[stream->index], *data_end = &stream->data[stream->data_size];
+	char *p = word_start;
+
+	/* Scan up to the end of the word.
+	 * Note that some (ugly) manual loop unrolling is performed here.
+	 * This does improve performance by a noticeable amount. */
+	#define CONDITION (ch != ' ' && ch != '\t' && ch != '\\' &&\
+			ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
+	#define LOOPBODY if (CONDITION) { ++p; ch = *p; } else { break; }
+	char ch = *p;
+	while ((p < data_end-8) && CONDITION)
+	{
+		++p; ch = *p;
+		LOOPBODY LOOPBODY LOOPBODY
+		LOOPBODY LOOPBODY LOOPBODY LOOPBODY
+	}
+	while ((p < data_end) && ch != ' ' && ch != '\t' && ch != '\\' &&
+		ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
+	{
+		++p; ch = *p;
+	}
+
+	/* if encountered an escape code, cancel this function's work, and use another more complex (slower) function */
+	if (ch == '\\') {
+		parse_escaped_word_item(stream, token);
+		return;
+	}
+
+	/* return a reference to the data slice */
+	token->type = TML_TOKEN_ITEM;
+	token->value = word_start;
+	token->value_size = (p - word_start);
+
+	stream->index += token->value_size;
+}
+
 
 
