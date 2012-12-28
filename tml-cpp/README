@@ -10,7 +10,7 @@ What is TML?
 
 What's in this folder? 
 
-	This folder contains a TML parser API in C++.
+	This folder contains a TML parser and document tree API in C++.
 
 	The parser itself is implemented in C (in the "tml-c" folder); this is just a
 	simple C++ wrapper around the C functions, providing a more convenient
