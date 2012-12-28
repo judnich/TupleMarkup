@@ -39,7 +39,7 @@ struct tml_node
 	/* If this is a leaf "word" node, this string contains the contents of that word.
 	 * If on the other hand this is a list node, this will be an empty string "".
 	 * (It is guaranteed to never be NULL, even for TML_NODE_NULL nodes) */
-	char *value;
+	const char *value;
 
 	/* This will be 0 if there is no next sibling. If nonzero, do not try to use the value yourself.
 	 * Use the tml_next_sibling() function to return a new struct tml_node corresponding to the sibling.*/

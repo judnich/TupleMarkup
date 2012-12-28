@@ -466,7 +466,7 @@ static char *write_node_to_string(const struct tml_node *node, char *dest_str, c
 		return dest_str;
 
 	if (!tml_has_children(node)) {
-		char *value;
+		const char *value;
 		size_t nodelen;
 
 		if (!tml_is_list(node)) {
@@ -617,7 +617,7 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
 
 /* --------------- UTILITY FUNCTIONS (COMPARISON / PATTERN MATCHING AND SEARCH) -------------------- */
 
-static enum TML_WILDCARD check_wildcard(char *value)
+static enum TML_WILDCARD check_wildcard(const char *value)
 {
 	/* special string with ASCII character #1 and #2 are \? and \* wildcards */
 	if (value[0] == '\0')
