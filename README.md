@@ -1,4 +1,4 @@
-#Tuple Markup Language
+## Tuple Markup Language
 
 An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
 
@@ -13,7 +13,7 @@ In contrast, many software engineers find XML to be overly verbose, irregular, c
 
 ### What is in this repository?
 
-This repo contains TML parsers and query APIs implemented in a variety of languages -- currently C, C++, and JavaScript. Implementations in more languages (e.g. Google Go, Python, Ruby, etc.) are planned, as time permits. Refer to a TML parser implementation folder for examples and documentation on reading TML data in your application.
+This repo contains TML parsers and document tree APIs implemented in a variety of languages -- currently C, C++, and JavaScript. Implementations in more languages (e.g. Go, Python, Ruby, etc.) are planned, as time permits. Refer to a TML parser implementation folder for examples and documentation on reading TML data in your application.
 
 
 ##TML Examples
