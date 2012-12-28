@@ -33,11 +33,10 @@ static void set_parse_error(struct tml_doc *data, const char *error_message);
 static void parse_root(struct tml_doc *data, struct tml_stream *tokens);
 static size_t parse_list_node(struct tml_doc *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out);
 
+const struct tml_node TML_NODE_NULL = { value: "", buff: 0, next_sibling: 0, first_child: 0 };
 
 #define FULL_NODE_DATA_FLAG 0xFF
 static const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
-
-static struct tml_node NULL_NODE = { value: "", buff: 0, next_sibling: 0, first_child: 0 };
 
 
 static void grow_buffer_if_needed(struct tml_doc *data, size_t new_size)
@@ -250,7 +249,7 @@ static void parse_root(struct tml_doc *data, struct tml_stream *tokens)
 			set_parse_error(data, "File contents is empty");
 		else
 			set_parse_error(data, "Expecting opening bracket at start of file");
-		data->root_node = NULL_NODE;
+		data->root_node = TML_NODE_NULL;
 		return;
 	}
 
@@ -423,7 +422,7 @@ struct tml_node tml_next_sibling(const struct tml_node *node)
 	if (node->next_sibling)
 		return read_node(node->buff, node->buff + node->next_sibling);
 	else
-		return NULL_NODE;
+		return TML_NODE_NULL;
 }
 
 struct tml_node tml_first_child(const struct tml_node *node)
@@ -431,7 +430,7 @@ struct tml_node tml_first_child(const struct tml_node *node)
 	if (node->first_child)
 		return read_node(node->buff, node->buff + node->first_child);
 	else
-		return NULL_NODE;
+		return TML_NODE_NULL;
 }
 
 int tml_child_count(const struct tml_node *node)
@@ -455,7 +454,7 @@ struct tml_node tml_child_at_index(const struct tml_node *node, int child_index)
 		count++;
 		cnode = tml_next_sibling(&cnode);
 	}
-	return NULL_NODE;
+	return TML_NODE_NULL;
 }
 
 
@@ -695,7 +694,7 @@ struct tml_node tml_find_first_child(const struct tml_node *node, const struct t
 		child = tml_next_sibling(&child);
 	}
 
-	return NULL_NODE;
+	return TML_NODE_NULL;
 }
 
 struct tml_node tml_find_next_sibling(const struct tml_node *node, const struct tml_node *pattern)
@@ -708,7 +707,7 @@ struct tml_node tml_find_next_sibling(const struct tml_node *node, const struct 
 		sib = tml_next_sibling(&sib);
 	}
 
-	return NULL_NODE;
+	return TML_NODE_NULL;
 }
 
 

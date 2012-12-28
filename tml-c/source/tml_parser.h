@@ -38,7 +38,7 @@ struct tml_node
 {
 	/* If this is a leaf "word" node, this string contains the contents of that word.
 	 * If on the other hand this is a list node, this will be an empty string "".
-	 * (It is guaranteed to never be NULL) */
+	 * (It is guaranteed to never be NULL, even for TML_NODE_NULL nodes) */
 	char *value;
 
 	/* This will be 0 if there is no next sibling. If nonzero, do not try to use the value yourself.
@@ -49,7 +49,7 @@ struct tml_node
 	 * Use the tml_first_child() function to return a new struct tml_node corresponding to the child.*/
 	tml_offset_t first_child;
 
-	/* INTERNAL - Do not touch. */
+	/* This will be 0 if this is a "null" node. If nonzero, do NOT try to use or change the value yourself. */
 	char *buff;
 };
 
@@ -65,6 +65,9 @@ struct tml_doc
 	char *buff;
 	size_t buff_index, buff_allocated;
 };
+
+/* Iteration functions return this tml_node value when there's no such next node to return */
+extern const struct tml_node TML_NODE_NULL;
 
 
 /* --------------- DATA PARSE FUNCTIONS -------------------- */
@@ -104,11 +107,11 @@ struct tml_node tml_next_sibling(const struct tml_node *node); /* O(1) time */
  * null output condition with tml_is_node_null() */
 struct tml_node tml_first_child(const struct tml_node *node); /* O(1) time */
 
-/* Returns true if this is a null node. A null node is a special node that doesn't
- * actually exist anywhere within your TML file. It's used to indicate the end of 
- * an iteration. Specifically, when tml_next_sibling() or tml_first_child() are called
- * but no appropriate successor exists, a "null" tml_node value is returned.
- * Use this function to determined whether that is a null node or not. */
+/* Returns true if this is the null node (TML_NODE_NULL). A null node is a special
+ * node that doesn't actually exist anywhere within your TML file. It's used to 
+ * indicate the end of an iteration. Specifically, when tml_next_sibling() or 
+ * tml_first_child() are called but no appropriate successor exists, TML_NODE_NULL
+ * is returned. Use this function quickly check if this node is TML_NODE_NULL. */
 static TML_INLINE bool tml_is_null(const struct tml_node *node)
 {
 	return node->buff == 0;

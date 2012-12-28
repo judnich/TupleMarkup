@@ -30,6 +30,7 @@ class TmlNode;
 class TmlNode
 {
 public:
+	TmlNode() : node(TML_NODE_NULL) {}
 	TmlNode(const struct tml_node n) : node(n) {}
 	TmlNode(const TmlNode &c) : node(c.node) {}
 
@@ -164,16 +165,22 @@ private:
 class TmlDoc
 {
 public:
-	TmlDoc(struct tml_doc *d) : data(d) {}
-
-	~TmlDoc()
+	TmlDoc(struct tml_doc *d) : data(d)
 	{
-		tml_free_doc(data);
+		if (data == NULL)
+			throw "Error instantiating tml_doc";
 	}
 
 	TmlDoc(std::string dataStr)
 	{
 		data = tml_parse_string(dataStr.c_str());
+		if (data == NULL)
+			throw "Error instantiating tml_doc";
+	}
+
+	~TmlDoc()
+	{
+		tml_free_doc(data);
 	}
 
 	static TmlDoc *parseFile(const std::string &filename)
@@ -204,10 +211,8 @@ public:
 	}
 
 private:
-	// copying not allowed
-	explicit TmlDoc(const TmlDoc &c) { data = NULL; }
-	// no empty data allowed
-	explicit TmlDoc() { data = NULL; }
+	explicit TmlDoc(const TmlDoc &c) { throw "Copying TmlDoc not allowed"; }
+	explicit TmlDoc() { throw "Empty TmlDoc not allowed"; }
 
 	struct tml_doc *data;
 };
