@@ -14,8 +14,8 @@ int main(void)
 	string str = "[ [color|red] [position | 0.1 9.8 2.55] ]";
 	cout << "Parsing \"" << str << "\"..." << endl;
 
-	TmlData *data = TmlData::parseString(str);
-	TmlNode root = data->getRoot();
+	TmlDoc *doc = TmlDoc::parseString(str);
+	TmlNode root = doc->getRoot();
 
 	TmlNode positionNode = root.findFirstChild("[position | \\? \\? \\?]"); // returns [position | 0.1 9.8 2.55]
 	string nodeName = positionNode.getChildAtIndex(0).toString(); // returns "position"
@@ -29,6 +29,6 @@ int main(void)
 
 	cout << endl;
 
-	delete data;
+	delete doc;
 	return 0;
 }

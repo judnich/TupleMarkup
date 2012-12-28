@@ -10,10 +10,10 @@ int g_test_num = 0, g_pass_count = 0;
 
 void test_tml(char *source_string, char *expected_output, bool brackets)
 {
-	struct tml_data *data = tml_parse_string(source_string);
-	struct tml_node root = tml_data_root(data);
+	struct tml_doc *doc = tml_parse_string(source_string);
+	struct tml_node root = doc->root_node;
 
-	const char *err = tml_parse_error(data);
+	const char *err = doc->error_message;
 
 	g_test_num++;
 	printf("#%d ", g_test_num);
@@ -25,13 +25,13 @@ void test_tml(char *source_string, char *expected_output, bool brackets)
 		}
 		else
 			printf("%s: Expected error.\n", FAIL_MSG);
-		tml_free_data(data);
+		tml_free_doc(doc);
 		return;
 	}
 
 	if (err) {
 		printf("%s: Unexpected parse error: \"%s\"\n", FAIL_MSG, err);
-		tml_free_data(data);
+		tml_free_doc(doc);
 		return;
 	}
 
@@ -49,7 +49,7 @@ void test_tml(char *source_string, char *expected_output, bool brackets)
 		printf("%s: Produced \"%s\", expected \"%s\".\n", FAIL_MSG, buff, expected_output);
 	}
 
-	tml_free_data(data);	
+	tml_free_doc(doc);	
 }
 
 /* This test makes sure the node to string function respects the buffer length limit.
@@ -60,8 +60,8 @@ void test_node_to_string(const char *parse_str, const char *test_str, bool brack
 {
 	int test_str_len = strlen(test_str);
 
-	struct tml_data *data = tml_parse_string(parse_str);
-	struct tml_node root = tml_data_root(data);
+	struct tml_doc *doc = tml_parse_string(parse_str);
+	struct tml_node root = doc->root_node;
 
 	char buff[1024];
 	int i, j;
@@ -82,20 +82,20 @@ void test_node_to_string(const char *parse_str, const char *test_str, bool brack
 
 		if (size != expected_size) {
 			printf("%s: Node to string conversion %d claimed size %ld, expected %ld.\n", FAIL_MSG, i, size, expected_size);
-			tml_free_data(data);
+			tml_free_doc(doc);
 			return;
 		}
 
 		for (j = 0; j < expected_size; ++j) {
 			if (buff[j] != test_str[j]) {
 				printf("%s: Node to string test failed - invalid string produced.\n", FAIL_MSG);
-				tml_free_data(data);
+				tml_free_doc(doc);
 				return;
 			}
 		}
 		if (buff[expected_size] != '\0') {
 			printf("%s: Node to string test failed - invalid null termination string length.\n", FAIL_MSG);
-			tml_free_data(data);
+			tml_free_doc(doc);
 			return;
 		}
 	}
@@ -103,7 +103,7 @@ void test_node_to_string(const char *parse_str, const char *test_str, bool brack
 	printf("%s\n", PASS_MSG);
 	g_pass_count++;
 
-	tml_free_data(data);
+	tml_free_doc(doc);
 }
 
 void test_pattern_match(const char *candidate, const char *pattern, bool match)
@@ -111,10 +111,10 @@ void test_pattern_match(const char *candidate, const char *pattern, bool match)
 	g_test_num++;
 	printf("#%d ", g_test_num);
 
-	struct tml_data *c_data = tml_parse_string(candidate);
-	struct tml_data *p_data = tml_parse_string(pattern);
+	struct tml_doc *c_doc = tml_parse_string(candidate);
+	struct tml_doc *p_doc = tml_parse_string(pattern);
 
-	bool actual_match = tml_compare_nodes(tml_data_root_ptr(c_data), tml_data_root_ptr(p_data));
+	bool actual_match = tml_compare_nodes(&c_doc->root_node, &p_doc->root_node);
 	if (actual_match == match) {
 		printf("%s\n", PASS_MSG);
 		g_pass_count++;
@@ -123,8 +123,8 @@ void test_pattern_match(const char *candidate, const char *pattern, bool match)
 		printf("%s\n", FAIL_MSG);
 	}
 
-	tml_free_data(c_data);
-	tml_free_data(p_data);
+	tml_free_doc(c_doc);
+	tml_free_doc(p_doc);
 }
 
 void print_report()

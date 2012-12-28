@@ -29,18 +29,18 @@
 #include <stdio.h>
 
 
-static void set_parse_error(struct tml_data *data, const char *error_msg);
-static void parse_root(struct tml_data *data, struct tml_stream *tokens);
-static size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out);
+static void set_parse_error(struct tml_doc *data, const char *error_message);
+static void parse_root(struct tml_doc *data, struct tml_stream *tokens);
+static size_t parse_list_node(struct tml_doc *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out);
 
 
 #define FULL_NODE_DATA_FLAG 0xFF
 static const int NODE_LINK_DATA_SIZE = sizeof(char) + sizeof(tml_offset_t)*2;
 
-static struct tml_node NULL_NODE = { 0, 0, 0, "" };
+static struct tml_node NULL_NODE = { value: "", buff: 0, next_sibling: 0, first_child: 0 };
 
 
-static void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
+static void grow_buffer_if_needed(struct tml_doc *data, size_t new_size)
 {
 	if (new_size >= TML_PARSER_MAX_DATA_SIZE) {
 		set_parse_error(data, 
@@ -53,7 +53,7 @@ static void grow_buffer_if_needed(struct tml_data *data, size_t new_size)
 	}
 }
 
-static void shrink_buffer(struct tml_data *data)
+static void shrink_buffer(struct tml_doc *data)
 {
 	if (data->buff) {
 		data->buff_allocated = data->buff_index;
@@ -62,14 +62,14 @@ static void shrink_buffer(struct tml_data *data)
 }
 
 
-struct tml_data *tml_parse_in_memory(char *ibuff, size_t ibuff_size)
+struct tml_doc *tml_parse_in_memory(char *ibuff, size_t ibuff_size)
 {
-	struct tml_data *data = malloc(sizeof(*data));
+	struct tml_doc *data = malloc(sizeof(*data));
 	if (!data) return NULL;
 
 	memset(data, 0, sizeof(*data));
 
-	data->error_msg = NULL;
+	data->error_message = NULL;
 	data->buff_index = 0;
 	data->buff_allocated = ibuff_size * 2;
 	data->buff = malloc(data->buff_allocated);
@@ -96,23 +96,23 @@ struct tml_data *tml_parse_in_memory(char *ibuff, size_t ibuff_size)
 	return data;
 }
 
-struct tml_data *tml_parse_memory(const char *ibuff, size_t ibuff_size)
+struct tml_doc *tml_parse_memory(const char *ibuff, size_t ibuff_size)
 {
 	char *ibuff_copy = malloc(ibuff_size);
 	if (!ibuff_copy) return NULL;
 	memcpy(ibuff_copy, ibuff, ibuff_size);
-	struct tml_data *data = tml_parse_in_memory(ibuff_copy, ibuff_size);
+	struct tml_doc *data = tml_parse_in_memory(ibuff_copy, ibuff_size);
 	free(ibuff_copy);
 	return data;
 }
 
-struct tml_data *tml_parse_string(const char *str)
+struct tml_doc *tml_parse_string(const char *str)
 {
 	size_t len = strlen(str);
 	return tml_parse_memory(str, len);
 }
 
-struct tml_data *tml_parse_file(const char *filename)
+struct tml_doc *tml_parse_file(const char *filename)
 {
 	long int fsize;
 
@@ -136,7 +136,7 @@ struct tml_data *tml_parse_file(const char *filename)
 		return NULL;
 	}
 
-	struct tml_data *data = tml_parse_in_memory(buff, fsize);
+	struct tml_doc *data = tml_parse_in_memory(buff, fsize);
 
 	fclose(fp);
 	free(buff);
@@ -144,7 +144,7 @@ struct tml_data *tml_parse_file(const char *filename)
 	return data;
 }
 
-void tml_free_data(struct tml_data *data)
+void tml_free_doc(struct tml_doc *data)
 {
 	if (data) {
 		if (data->buff)
@@ -153,30 +153,14 @@ void tml_free_data(struct tml_data *data)
 	}
 }
 
-static void set_parse_error(struct tml_data *data, const char *error_msg)
+static void set_parse_error(struct tml_doc *data, const char *error_message)
 {
-	if (data->error_msg == NULL)
-		data->error_msg = error_msg;
-}
-
-const char *tml_parse_error(const struct tml_data *data)
-{
-	return data->error_msg;
-}
-
-struct tml_node tml_data_root(const struct tml_data *data)
-{
-	return data->root_node;
-}
-
-const struct tml_node *tml_data_root_ptr(const struct tml_data *data)
-{
-	return &data->root_node;
+	if (data->error_message == NULL)
+		data->error_message = error_message;
 }
 
 
-
-static void write_packed_node(struct tml_data *data, const char *str, int str_len, int sibling_offset)
+static void write_packed_node(struct tml_doc *data, const char *str, int str_len, int sibling_offset)
 {
 	size_t index = data->buff_index;
 
@@ -202,7 +186,7 @@ static void write_packed_node(struct tml_data *data, const char *str, int str_le
 	data->buff_index = index;
 }
 
-static size_t write_node(struct tml_data *data, const char *str, int str_len)
+static size_t write_node(struct tml_doc *data, const char *str, int str_len)
 {
 	size_t index = data->buff_index;
 
@@ -257,7 +241,7 @@ static __inline__ size_t get_node_sibling(char *node_ptr)
 
 
 /* Parses "[...]" */
-static void parse_root(struct tml_data *data, struct tml_stream *tokens)
+static void parse_root(struct tml_doc *data, struct tml_stream *tokens)
 {
 	struct tml_token token = tml_stream_pop(tokens);
 
@@ -292,7 +276,7 @@ static void parse_root(struct tml_data *data, struct tml_stream *tokens)
 
 /* Parses "...]", a list where we assume that the opening brace has been read. 
  * After returning from this function, the stream will have read the closing brace. */
-static size_t parse_list_node(struct tml_data *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out)
+static size_t parse_list_node(struct tml_doc *data, struct tml_stream *tokens, bool process_divider, struct tml_token *token_out)
 {
 	/* this is the container node for the list contents */
 	size_t root_node = write_node(data, NULL, 0);

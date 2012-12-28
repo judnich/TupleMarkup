@@ -268,18 +268,18 @@ void write_xml_node(FILE *fout, int indent, struct tml_node node)
 
 void tml_to_xml(const char *source_file, const char *dest_file)
 {
-	struct tml_data *pattern = tml_parse_string("[ \\? \\* | \\* ]");
-	element_markup_pattern = tml_data_root(pattern);
+	struct tml_doc *pattern = tml_parse_string("[ \\? \\* | \\* ]");
+	element_markup_pattern = pattern->root_node;
 
-	struct tml_data *doc = tml_parse_file(source_file);
+	struct tml_doc *doc = tml_parse_file(source_file);
 	if (doc == NULL) {
 		exit(error("Error parsing TML file."));
 	}
-	else if (tml_parse_error(doc)) {
-		exit(error(tml_parse_error(doc)));
+	else if (doc->error_message) {
+		exit(error(doc->error_message));
 	}
 
-	struct tml_node root_node = tml_data_root(doc);
+	struct tml_node root_node = doc->root_node;
 
 	FILE *fout = fopen(dest_file, "w");
 	if (!fout) {
@@ -293,8 +293,8 @@ void tml_to_xml(const char *source_file, const char *dest_file)
 
 	fclose(fout);
 
-	tml_free_data(doc);
-	tml_free_data(pattern);
+	tml_free_doc(doc);
+	tml_free_doc(pattern);
 }
 
 void run_benchmark(const char *xml_file, const char *tml_file)
@@ -315,8 +315,8 @@ void run_benchmark(const char *xml_file, const char *tml_file)
 	{
 		clock_t t = clock();
 
-		struct tml_data *doc = tml_parse_file(tml_file);
-		tml_free_data(doc);
+		struct tml_doc *doc = tml_parse_file(tml_file);
+		tml_free_doc(doc);
 
 		tml_time = (int)(clock() - t);
 	}

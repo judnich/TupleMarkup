@@ -36,52 +36,60 @@ typedef uint32_t tml_offset_t;
 
 struct tml_node
 {
-	char *buff;
+	/* If this is a leaf "word" node, this string contains the contents of that word.
+	 * If on the other hand this is a list node, this will be an empty string "".
+	 * (It is guaranteed to never be NULL) */
+	char *value;
+
+	/* This will be 0 if there is no next sibling. If nonzero, do not try to use the value yourself.
+	 * Use the tml_next_sibling() function to return a new struct tml_node corresponding to the sibling.*/
 	tml_offset_t next_sibling;
+
+	/* This will be 0 if this has no child nodes. If nonzero, do not try to use the value yourself.
+	 * Use the tml_first_child() function to return a new struct tml_node corresponding to the child.*/
 	tml_offset_t first_child;
-	char *value; /* will never be NULL, but may be "" */
+
+	/* INTERNAL - Do not touch. */
+	char *buff;
 };
 
-struct tml_data
+struct tml_doc
 {
+	/* This contains the root node for data represented by the tml_doc object */
 	struct tml_node root_node;
+
+	/* This contains an error description string when a parse error occurred, or NULL if no errors */
+	const char *error_message;
+
+	/* INTERNAL - Do not touch. This is the internal data buffer where all node data and strings are stored */
 	char *buff;
 	size_t buff_index, buff_allocated;
-	const char *error_msg;
 };
+
 
 /* --------------- DATA PARSE FUNCTIONS -------------------- */
 
-/* Create a new tml_data object, parsing from TML text contained within the given C string. */
-struct tml_data *tml_parse_string(const char *str);
+/* Create a new tml_doc object, parsing from TML text contained within the given C string. */
+struct tml_doc *tml_parse_string(const char *str);
 
-/* Create a new tml_data object, parsing from TML text from the file specified (by filename). */
-struct tml_data *tml_parse_file(const char *filename);
+/* Create a new tml_doc object, parsing from TML text from the file specified (by filename). */
+struct tml_doc *tml_parse_file(const char *filename);
 
-/* Create a new tml_data object, parsing from TML text contained within the given memory buffer.
+/* Create a new tml_doc object, parsing from TML text contained within the given memory buffer.
  * The parsing procedure allocates its own memory for parsed data, so you can delete your "buff"
  * data right after calling this if you want. */
-struct tml_data *tml_parse_memory(const char *buff, size_t buff_size);
+struct tml_doc *tml_parse_memory(const char *buff, size_t buff_size);
 
-/* Create a new tml_data object, parsing from TML text contained within the given memory buffer,
+/* Create a new tml_doc object, parsing from TML text contained within the given memory buffer,
  * using the given memory buffer as a parser working space to conserve memory (less malloc's). This 
  * means that your "buff" data may be modified by the parsing process, so consider the data invalidated 
  * after calling this. The parsing procedure creates its own internal memory for parsed data, so you can
  * delete the "buff" data right after calling this. */
-struct tml_data *tml_parse_in_memory(char *buff, size_t buff_size);
+struct tml_doc *tml_parse_in_memory(char *buff, size_t buff_size);
 
-/* Call this to destroy a tml_data object (do NOT just use free() on a tml_data* object) 
+/* Call this to destroy a tml_doc object (do NOT just use free() on a tml_doc* object) 
  * Warning: Once you call this, all tml_node values derived from this data object will be invalidated. */
-void tml_free_data(struct tml_data *data);
-
-/* Returns an error description string if a parse error occurred, or NULL if no errors */
-const char *tml_parse_error(const struct tml_data *data);
-
-/* Returns the root node for data represented by the tml_data object */
-struct tml_node tml_data_root(const struct tml_data *data);
-
-/* Same as tml_data_root(), but returns as a pointer to tml_node for when this is more convenient. */
-const struct tml_node *tml_data_root_ptr(const struct tml_data *data);
+void tml_free_doc(struct tml_doc *data);
 
 
 /* --------------- NODE ITERATION FUNCTIONS -------------------- */
@@ -176,7 +184,7 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
  *
  * For standard equality comparison, this works very straightforwardly. It will return true if both 
  * sides are equivalent (e.g. would return true for left = [1 2 3] and the right = [1 2 3], even if
- * they're from different nodes from the tree or entirely different tml_data objects).
+ * they're from different nodes from the tree or entirely different tml_doc objects).
  *
  * Pattern matching allows you to match the left side against a pattern on the right side which may
  * include wildcards. There are two types of wildcards, written as "\*" and "\?" in TML.

@@ -20,10 +20,10 @@ extern "C" {
 
 #define MAX_TML_STRING_SIZE 4096
 
-class TmlData;
+class TmlDoc;
 class TmlNode;
 
-// A TmlNode is a "handle" to a node within TML data tree (stored in a TmlData object). You can
+// A TmlNode is a "handle" to a node within TML tml_doc tree (stored in a TmlData object). You can
 // use methods here to traverse the tree, like getFirstChild() and getNextSibling(). When you find
 // a node of interest, useful methods like toInt(), toDouble(), toString(), toMarkupString() allow
 // you to convert its contents to something you can use.
@@ -141,9 +141,9 @@ public:
 		return TmlNode( tml_find_next_sibling(&node, &pattern.node) );
 	}
 
-	bool compareToPattern(const TmlData *patternData) const;
-	TmlNode findFirstChild(const TmlData *patternData) const;
-	TmlNode findNextSibling(const TmlData *patternData) const;
+	bool compareToPattern(const TmlDoc *patternData) const;
+	TmlNode findFirstChild(const TmlDoc *patternData) const;
+	TmlNode findNextSibling(const TmlDoc *patternData) const;
 
 	// Be careful, the following overloads are potentially inefficient because they allocate, parse, and
 	// free the pattern string these functions are used.
@@ -157,76 +157,76 @@ private:
 };
 
 
-// TmlData represents a loaded TML load hierarchy, which was parsed from some file/string/memory.
+// TmlDoc represents a loaded TML load hierarchy, which was parsed from some file/string/memory.
 // Use this class to manage the lifetime of TML data, and as an entry point into the node tree via getRoot().
 // Warning: When this object is destroyed, all TmlNode objects derived from it will no longer be valid
 // or safe to use (though they will still be safe to destroy).
-class TmlData
+class TmlDoc
 {
 public:
-	TmlData(struct tml_data *d) : data(d) {}
+	TmlDoc(struct tml_doc *d) : data(d) {}
 
-	~TmlData()
+	~TmlDoc()
 	{
-		tml_free_data(data);
+		tml_free_doc(data);
 	}
 
-	TmlData(std::string dataStr)
+	TmlDoc(std::string dataStr)
 	{
 		data = tml_parse_string(dataStr.c_str());
 	}
 
-	static TmlData *parseFile(const std::string &filename)
+	static TmlDoc *parseFile(const std::string &filename)
 	{
-		return new TmlData( tml_parse_file(filename.c_str()) );
+		return new TmlDoc( tml_parse_file(filename.c_str()) );
 	}
 
-	static TmlData *parseString(const std::string &data)
+	static TmlDoc *parseString(const std::string &data)
 	{
-		return new TmlData( tml_parse_string(data.c_str()) );
+		return new TmlDoc( tml_parse_string(data.c_str()) );
 	}
 
-	static TmlData *parseMemory(const char *buff, size_t buff_size)
+	static TmlDoc *parseMemory(const char *buff, size_t buff_size)
 	{
-		return new TmlData( tml_parse_memory(buff, buff_size) );
+		return new TmlDoc( tml_parse_memory(buff, buff_size) );
 	}
 
 	TmlNode getRoot() const
 	{
-		return TmlNode(tml_data_root(data));
+		return TmlNode(data->root_node);
 	}
 
 	std::string getParseError() const
 	{
-		const char *str = tml_parse_error(data);
+		const char *str = data->error_message;
 		if (!str) return std::string();
 		else return std::string(str);
 	}
 
 private:
 	// copying not allowed
-	explicit TmlData(const TmlData &c) { data = NULL; }
+	explicit TmlDoc(const TmlDoc &c) { data = NULL; }
 	// no empty data allowed
-	explicit TmlData() { data = NULL; }
+	explicit TmlDoc() { data = NULL; }
 
-	struct tml_data *data;
+	struct tml_doc *data;
 };
 
 
 
-bool TmlNode::compareToPattern(const TmlData *patternData) const
+bool TmlNode::compareToPattern(const TmlDoc *patternData) const
 {
 	TmlNode pattern = patternData->getRoot();
 	return compareToPattern(pattern);
 }
 
-TmlNode TmlNode::findFirstChild(const TmlData *patternData) const
+TmlNode TmlNode::findFirstChild(const TmlDoc *patternData) const
 {
 	TmlNode pattern = patternData->getRoot();
 	return findFirstChild(pattern);
 }
 
-TmlNode TmlNode::findNextSibling(const TmlData *patternData) const
+TmlNode TmlNode::findNextSibling(const TmlDoc *patternData) const
 {
 	TmlNode pattern = patternData->getRoot();
 	return findNextSibling(pattern);
@@ -235,21 +235,21 @@ TmlNode TmlNode::findNextSibling(const TmlData *patternData) const
 
 bool TmlNode::compareToPattern(const std::string &patternStr) const
 {
-	TmlData patternData(patternStr);
+	TmlDoc patternData(patternStr);
 	TmlNode pattern = patternData.getRoot();
 	return compareToPattern(pattern);
 }
 
 TmlNode TmlNode::findFirstChild(const std::string &patternStr) const
 {
-	TmlData patternData(patternStr);
+	TmlDoc patternData(patternStr);
 	TmlNode pattern = patternData.getRoot();
 	return findFirstChild(pattern);
 }
 
 TmlNode TmlNode::findNextSibling(const std::string &patternStr) const
 {
-	TmlData patternData(patternStr);
+	TmlDoc patternData(patternStr);
 	TmlNode pattern = patternData.getRoot();
 	return findNextSibling(pattern);
 }
