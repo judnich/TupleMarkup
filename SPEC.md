@@ -59,3 +59,6 @@ separated by whitespace or by a reserved symbol (whitespace is not included in
 parsed words). Whitespace can be added to words only through escape codes
 `\s`, `\t`, etc.
 
+### License
+
+Copyright (C) 2012 John Judnich. Released as open-source under The MIT Licence.
