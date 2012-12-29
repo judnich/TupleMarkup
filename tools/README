@@ -1,0 +1,18 @@
+What is TML?
+
+	TML (Tuple Markup Language)
+	github.com/judnich/TupleMarkup
+
+	An extremely simple all-purpose markup language: nested lists with 
+	bracket-minimizing syntax. It enables XML-like and YAML-like semantics 
+	within the same clean and consistent language, plus much more.
+
+TML Tools
+
+	The subfolders here contain tools to make transitioning to and working
+	with TML as easy as possible. Below are some brief descriptions of each.
+
+tml-convert
+
+	A command-line tool for converting XML files to TML files, and vice versa.
+
