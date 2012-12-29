@@ -1,0 +1,46 @@
+What is TML?
+
+	TML (Tuple Markup Language)
+	github.com/judnich/TupleMarkup
+
+	An extremely simple all-purpose markup language: nested lists with 
+	bracket-minimizing syntax. It enables XML-like and YAML-like semantics 
+	within the same clean and consistent language.
+
+
+What's in this folder?
+
+	This folder contains tml-convert, a command-line tool for converting 
+	XML files to TML files, and vice versa.
+
+How does it work?
+
+	You may notice that while XML includes special syntax to express element
+	tag names, attribute names and values, and data within element tags, TML
+	does not. Ultimately, TML is just nested lists. So how do we convert XML
+	to TML and vice versa?
+
+	TML document tree APIs (the API that allows you to traverse the nested
+	lists / items) provide a powerful pattern matching feature that allows
+	you to define virtually any data semantics / organization you want.
+
+	In this case, we expect a certain pattern of TML nodes to express the
+	data structure of an XML element. For example, the XML element:
+
+		<tag-name attrib="val">content</name>
+
+	Would be translated into the following TML:
+
+		[tag-name [attrib val1] | content]
+
+	The pattern is simple. Every XML element represented in TML is 
+	formatted with markup on the left of the divider, and content on the
+	right. The left markup begins with the element name, followed by
+	a number of attributes (if any). An attribute name-value pair is 
+	surrounded with brackets, where the first word within is the attribute
+	name and everything following is the value.
+
+Installation
+
+	tml-convert requires Libxml2 for XML parsing. Once this is installed, 
+	type "build" from this folder ("tools/tml-convert/").

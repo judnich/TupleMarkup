@@ -26,8 +26,8 @@ Notes regarding JSON
 
 	TML is *not* meant to replace JSON for automatic JavaScript object serialization.
 
-	As a subset of JavaScript, JSON is ideal for serialization of JavaScript application
-	data. Writing/reading JavaScript objects with JSON is automatic, because JSON is JS.
+	Being almost a subset of JavaScript, JSON is ideal for serialization of JavaScript 
+	application data - writing/reading JavaScript objects with JSON is automatic. 
 
 	TML is more generic than JSON, aiming to provide an extremely clean intermediate 
 	human-readable data format for a wider range of data semantics, languages, and 
