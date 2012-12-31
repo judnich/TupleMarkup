@@ -1,5 +1,6 @@
 # TML Tutorial and Examples
 
+Note: This file includes some redundant info from the README plus extra content (particularly extra examples).
 
 ## What is TML?
 
@@ -35,7 +36,7 @@ is equivalent to:
 
     [ [position] [1 2 3] ]
 
-Keep in mind you can use it as many times as you like, for example:
+Keep in mind you can use it to create as many nested lists as you like. For example:
 
     [abc|def|ghi]
 
@@ -64,7 +65,7 @@ The last two, `\?` and `\*`, are escape codes meant to be used as wildcard token
 
 ### Done.
 
-That's it! You now know all of TML. Take a look at the examples if you haven't already to see how it looks in use.
+That's it! You now know all of TML. Take a look at the examples to see how it looks in use.
 
 
 
@@ -117,22 +118,21 @@ Compare to JSON:
 
 ### TML example describing a 3D pyramid object for OpenGL:
 
+This example shows how one might use TML to load/store 3D models for an OpenGL graphics application. TML enables concise lists of vertex coordinates and element indexes, making this very natural to read, write, and organize.
+
     [opengl model |
         [mode | indexed triangles]
 
-        [vbo |
-            [type | vertex]
+        [buffer vertex |
+            [attrib position | [layout interleaved] [type float3]]
+            [attrib uv | [layout interleaved] [type float2]]
 
-            [attrib position | [offset 0] [stride 20] [type float3]]
-            [attrib uv | [offset 12] [stride 20] [type float2]]
-
-            [buffer position | [0 1 0] [-1 0 -1] [1 0 -1] [-1 0 1] [1 0 1]]
-            [buffer uv | [0.5 0.0] [0 1] [1 1] [0 1] [1 1]]
+            [data position | [0 1 0] [-1 0 -1] [1 0 -1] [-1 0 1] [1 0 1]]
+            [data uv | [0.5 0.0] [0 1] [1 1] [0 1] [1 1]]
         ]
 
-        [vbo |
-            [type | element16]
-            [buffer | 0 1 2  0 2 3  0 3 4  0 4 1 ]
+        [buffer element16 |
+            [data | 0 1 2  0 2 3  0 3 4  0 4 1 ]
         ]
 
         [texture 0 |
@@ -145,9 +145,9 @@ Compare to JSON:
         [program vertex | media/rocky.vert]
     ]
 
-### TML example excerpt from a converted SVG Image file:
+### TML example excerpt from a converted SVG image file:
 
-This small part of a larger SVG (XML) file was converted (and formatted) to TML automatically using the included tml-convert translation tool. SVG isn't particularly humanly readible, even in TML (though not as bad as XML).
+This small part of a larger SVG (XML) file was converted (and formatted) to TML automatically using the included `tml-convert` commandline translation tool. SVG isn't particularly humanly readible, though TML is a bit better.
 
     [svg [version 1.1] [width 1000] [height 1100] [viewBox 0 0 1000 1100] [id svg3089] | 
         [defs [id defs3091] | 
@@ -179,6 +179,47 @@ This small part of a larger SVG (XML) file was converted (and formatted) to TML 
             || ... this is just a small section from a large SVG file ...
         ]
     ]
+
+Compare to XML:
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            version="1.1" width="1000" height="1100" viewBox="0 0 1000 1100" id="svg3089">
+        <defs id="defs3091">
+            <linearGradient id="linearGradient3934">
+                <stop id="stop3936" style="stop-color:#baa286;stop-opacity:1" offset="0" />
+                <stop id="stop3946" style="stop-color:#dccdba;stop-opacity:1" offset="0.06" />
+                <stop id="stop3942" style="stop-color:#dccdba;stop-opacity:1" offset="0.73000002" />
+                <stop id="stop3948" style="stop-color:#e2d7c8;stop-opacity:1" offset="0.82999998" />
+                <stop id="stop3944" style="stop-color:#c7ad95;stop-opacity:1" offset="0.95999998" />
+                <stop id="stop3938" style="stop-color:#c7ad95;stop-opacity:1" offset="1" />
+            </linearGradient>
+            <linearGradient id="linearGradient3843">
+                <stop id="stop3845" style="stop-color:#e3d6c3;stop-opacity:1" offset="0" />
+                <stop id="stop3847" style="stop-color:#d4bfa8;stop-opacity:1" offset="0.34999999" />
+                <stop id="stop3849" style="stop-color:#d4bfa8;stop-opacity:1" offset="0.69999999" />
+                <stop id="stop3851" style="stop-color:#e7ddc8;stop-opacity:1" offset="1" />
+            </linearGradient>
+            <linearGradient id="linearGradient3825">
+                <stop id="stop3827" style="stop-color:#ede5d5;stop-opacity:1" offset="0" />
+                <stop id="stop3837" style="stop-color:#dcceba;stop-opacity:1" offset="0.34999999" />
+                <stop id="stop3835" style="stop-color:#e0cfb7;stop-opacity:1" offset="0.69999999" />
+                <stop id="stop3829" style="stop-color:#e7ddc8;stop-opacity:1" offset="1" />
+            </linearGradient>
+            <linearGradient id="linearGradient3719">
+                <stop id="stop3721" style="stop-color:#d4bfa8;stop-opacity:1" offset="0" />
+                <stop id="stop3723" style="stop-color:#d4bfa8;stop-opacity:1" offset="0.72000003" />
+                <stop id="stop3725" style="stop-color:#ede5d5;stop-opacity:1" offset="1" />
+            </linearGradient>
+            <!-- this is just a small section from a large SVG file -->
+        </defs>
+    </svg>
+    
+Parsing a large SVG file with Libxml2 for comparison showed:
+
+* TML's default C/C++ parser is 5x faster than Libxml2
+* TML's default C/C++ parser uses 1/5th the memory of Libxml2
+* The TML file on disk is 10% smaller than an XML/SVG file
 
 
 ## License
