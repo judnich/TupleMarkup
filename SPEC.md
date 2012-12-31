@@ -1,4 +1,4 @@
-##Tuple Markup Language Specification
+## Tuple Markup Language Specification
 
 TML is an extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
 
@@ -17,7 +17,8 @@ ignored, plus every character up to and including the next line-feed character.
 
 	syntax = grouped;
 
-	grouped = (open, list, close) | (open, list, divider, list, close) ;
+	grouped = (open, list, close) | (open, nested, close) ;
+	nested = (list, divider, list) | (list, divider, nested) ;
 	list = (item, {space}, list) | "" ;
 	item = grouped | word ;
 
