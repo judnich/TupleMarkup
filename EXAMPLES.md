@@ -164,18 +164,7 @@ This small part of a larger SVG (XML) file was converted (and formatted) to TML 
                 [stop [id stop3847] [style stop-color:#d4bfa8;stop-opacity:1] [offset 0.34999999] |] 
                 [stop [id stop3849] [style stop-color:#d4bfa8;stop-opacity:1] [offset 0.69999999] |] 
                 [stop [id stop3851] [style stop-color:#e7ddc8;stop-opacity:1] [offset 1] |] 
-            ] 
-            [linearGradient [id linearGradient3825] | 
-                [stop [id stop3827] [style stop-color:#ede5d5;stop-opacity:1] [offset 0] |] 
-                [stop [id stop3837] [style stop-color:#dcceba;stop-opacity:1] [offset 0.34999999] |] 
-                [stop [id stop3835] [style stop-color:#e0cfb7;stop-opacity:1] [offset 0.69999999] |] 
-                [stop [id stop3829] [style stop-color:#e7ddc8;stop-opacity:1] [offset 1] |] 
-            ] 
-            [linearGradient [id linearGradient3719] | 
-                [stop [id stop3721] [style stop-color:#d4bfa8;stop-opacity:1] [offset 0] |] 
-                [stop [id stop3723] [style stop-color:#d4bfa8;stop-opacity:1] [offset 0.72000003] |] 
-                [stop [id stop3725] [style stop-color:#ede5d5;stop-opacity:1] [offset 1] |] 
-            ] 
+            ]
             || ... this is just a small section from a large SVG file ...
         ]
     ]
@@ -199,17 +188,6 @@ Compare to XML:
                 <stop id="stop3847" style="stop-color:#d4bfa8;stop-opacity:1" offset="0.34999999" />
                 <stop id="stop3849" style="stop-color:#d4bfa8;stop-opacity:1" offset="0.69999999" />
                 <stop id="stop3851" style="stop-color:#e7ddc8;stop-opacity:1" offset="1" />
-            </linearGradient>
-            <linearGradient id="linearGradient3825">
-                <stop id="stop3827" style="stop-color:#ede5d5;stop-opacity:1" offset="0" />
-                <stop id="stop3837" style="stop-color:#dcceba;stop-opacity:1" offset="0.34999999" />
-                <stop id="stop3835" style="stop-color:#e0cfb7;stop-opacity:1" offset="0.69999999" />
-                <stop id="stop3829" style="stop-color:#e7ddc8;stop-opacity:1" offset="1" />
-            </linearGradient>
-            <linearGradient id="linearGradient3719">
-                <stop id="stop3721" style="stop-color:#d4bfa8;stop-opacity:1" offset="0" />
-                <stop id="stop3723" style="stop-color:#d4bfa8;stop-opacity:1" offset="0.72000003" />
-                <stop id="stop3725" style="stop-color:#ede5d5;stop-opacity:1" offset="1" />
             </linearGradient>
             <!-- this is just a small section from a large SVG file -->
         </defs>
