@@ -1,75 +1,6 @@
-# TML Tutorial and Examples
+## Tuple Markup Language Examples
 
-Note: This file includes some redundant info from the README plus extra content (particularly extra examples).
-
-## What is TML?
-
-TML allows you to express human-readable data with a syntax much simpler and less cluttered than other all-purpose markup/data languages. TML reserves only four symbols, yet is flexible enough to express an extremely wide range of data semantics.
-
-In contrast, many software engineers find XML to be overly verbose, irregular, complex, and bulky for most tasks. Related fact: The book "XML in a Nutshell" is **714** pages long.
-
-* _"XML sometimes feels an awful lot like using an enormous sledgehammer to drive common household nails." - [Jeff Atwood](http://www.codinghorror.com/blog/2008/05/xml-the-angle-bracket-tax.html)_
-
-
-
-## TML Syntax Tutorial
-
-### Basic Tuples
-
-This is an example of a tuple of four items (a "4-tuple"):
-
-    [a b c d]
-
-You can nest tuples and data arbitrarily, for example:
-
-    [ [blah blah] 1 2 3 [[x][y]] ]
-
-Writing empty tuples is also valid: `[]`. Nesting tuples of tuples is a common case, so we provide a special syntax for this.
-
-### Nesting Delimiter
-
-The bar `|` delimiter creates a nested tuple out of each section it separates. For example:
-
-    [ position | 1 2 3 ]
-
-is equivalent to:
-
-    [ [position] [1 2 3] ]
-
-Keep in mind you can use it to create as many nested lists as you like. For example:
-
-    [abc|def|ghi]
-
-is equivalent to:
-
-    [[abc] [def] [ghi]]
-
-Empty tuples will also be generated with the `|` delimiter if you delimit nothingness: `[ | ]` is equivalent to `[ [] [] ]`.
-
-
-### Comments
-
-Line comments are supported. Simply prefix the comment with `||`. For example:
-
-    || This is a line comment example.
-
-### Escape Codes
-
-For special characters, you may use `\` for escape codes much like in C. Escape codes supported are:
-
-    \n \r \t \s \\ \[ \] \| \? \*
-
-These respectively evaluate to: `newline code, return code, tab code, space, \, [, ], |, code 0x01, code 0x02`.
-
-The last two, `\?` and `\*`, are escape codes meant to be used as wildcard tokens by some TML APIs that allow you to use pattern-matching search queries on a TML tree (refer to the TML APIs documentation for more info). They don't have any unusual syntactic behavior.
-
-### Done.
-
-That's it! You now know all of TML. Take a look at the examples to see how it looks in use.
-
-
-
-## TML Examples
+_Note: This includes some redundant examples from the README, plus extra examples below._
 
 ### TML example demonstrating markup semantics:
 
@@ -197,7 +128,7 @@ Parsing a large SVG file with Libxml2 for comparison showed:
 
 * TML's default C/C++ parser is 5x faster than Libxml2
 * TML's default C/C++ parser uses 1/5th the memory of Libxml2
-* The TML file on disk is 10% smaller than an XML/SVG file
+* The TML file on disk is 10% smaller than the XML file
 
 
 ## License
