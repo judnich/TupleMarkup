@@ -1,9 +1,7 @@
-## Tuple Markup Language - Tutorial / Examples
-
-TML: An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
+# TML Tutorial and Examples
 
 
-### What is TML?
+## What is TML?
 
 TML allows you to express human-readable data with a syntax much simpler and less cluttered than other all-purpose markup/data languages. TML reserves only four symbols, yet is flexible enough to express an extremely wide range of data semantics.
 
@@ -37,11 +35,11 @@ is equivalent to:
 
     [ [position] [1 2 3] ]
 
-Though using `|` as a divider of two parts is common, you can use it as many times as you like, e.g.:
+Keep in mind you can use it as many times as you like, for example:
 
     [abc|def|ghi]
 
-which is equivalent to:
+is equivalent to:
 
     [[abc] [def] [ghi]]
 
@@ -117,7 +115,7 @@ Compare to JSON:
         }
     }
 
-### TML application data example describing a 3D pyramid object for OpenGL:
+### TML example describing a 3D pyramid object for OpenGL:
 
     [opengl model |
         [mode | indexed triangles]
@@ -149,6 +147,8 @@ Compare to JSON:
 
 ### TML example excerpt from a converted SVG Image file:
 
+This small part of a larger SVG (XML) file was converted (and formatted) to TML automatically using the included tml-convert translation tool. SVG isn't particularly humanly readible, even in TML (though not as bad as XML).
+
     [svg [version 1.1] [width 1000] [height 1100] [viewBox 0 0 1000 1100] [id svg3089] | 
         [defs [id defs3091] | 
             [linearGradient [id linearGradient3934] | 
@@ -179,8 +179,6 @@ Compare to JSON:
             || ... this is just a small section from a large SVG file ...
         ]
     ]
-
-This small part of a larger SVG (XML) file was converted (and formatted) to TML automatically using the included tml-convert translation tool. SVG isn't particularly humanly readible, even in TML (though not as bad as XML).
 
 
 ## License
