@@ -33,7 +33,7 @@ Compare to HTML/XML:
     	]
     ]
 
-Compare to JSON:
+Compare to JSON *(note - TML is NOT meant to replace JSON; this is only a syntax example)*:
     
     {
         "firstName": "John",
