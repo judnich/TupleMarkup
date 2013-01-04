@@ -35,6 +35,7 @@
 #define TML_OPEN_CHAR '['
 #define TML_CLOSE_CHAR ']'
 #define TML_DIVIDER_CHAR '|'
+#define TML_ESCAPE_CHAR '\\'
 
 /* This defines what escape codes "\?" and "\*" resolve to. There shouldn't be any
  * reason to change this. these escape codes are used to represent wildcards, used 

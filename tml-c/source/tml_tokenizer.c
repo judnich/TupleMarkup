@@ -147,7 +147,7 @@ void parse_escaped_word_item(struct tml_stream *stream, struct tml_token *token)
 	while (ch != ' ' && ch != '\t' && ch != -1 && 
 		ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
 	{
-		if (ch == '\\') {
+		if (ch == TML_ESCAPE_CHAR) {
 			/* substitute 2-character escape code with the character it represents */
 			next_char(stream);
 			ch = peek_char(stream);
@@ -182,7 +182,7 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 	/* Scan up to the end of the word.
 	 * Note that some (ugly) manual loop unrolling is performed here.
 	 * This does improve performance by a noticeable amount. */
-	#define CONDITION (ch != ' ' && ch != '\t' && ch != '\\' &&\
+	#define CONDITION (ch != ' ' && ch != '\t' && ch != TML_ESCAPE_CHAR &&\
 			ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
 	#define LOOPBODY if (CONDITION) { ++p; ch = *p; } else { break; }
 	char ch = *p;
@@ -192,14 +192,14 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 		LOOPBODY LOOPBODY LOOPBODY
 		LOOPBODY LOOPBODY LOOPBODY LOOPBODY
 	}
-	while ((p < data_end) && ch != ' ' && ch != '\t' && ch != '\\' &&
+	while ((p < data_end) && ch != ' ' && ch != '\t' && ch != TML_ESCAPE_CHAR &&
 		ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
 	{
 		++p; ch = *p;
 	}
 
 	/* if encountered an escape code, cancel this function's work, and use another more complex (slower) function */
-	if (ch == '\\') {
+	if (ch == TML_ESCAPE_CHAR) {
 		parse_escaped_word_item(stream, token);
 		return;
 	}
