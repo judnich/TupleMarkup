@@ -50,7 +50,7 @@ Compare to JSON *(note - TML is NOT meant to replace JSON; this is only a syntax
 
 ### TML example describing a 3D pyramid object for OpenGL:
 
-This example shows how one might use TML to load/store 3D models for an OpenGL graphics application. In addition to natural key-value pair syntax, TML enables concise lists of vertex coordinates and element indexes, making this very natural to read, write, and organize.
+This example shows how one might use TML to load/store 3D models for an OpenGL graphics application. In addition to natural key-value pair semantics, TML enables concise lists of vertex coordinates and element indexes, making this very natural to read, write, and organize.
 
     [opengl model |
         [mode | indexed triangles]
