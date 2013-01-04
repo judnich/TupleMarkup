@@ -22,11 +22,11 @@ Compare to HTML/XML:
 ### TML example demonstrating key-value pair semantics:
 
     [
-    	[firstName | John]
-    	[lastName | Smith]
+    	[first name | John]
+    	[last name | Smith]
     	[age | 25]
     	[address |
-    		[streetAddress | 21 2nd Street]
+    		[street address | 21 2nd Street]
     		[city | New York]
     		[state | NY]
     		[postalCode | 10021]
@@ -36,20 +36,21 @@ Compare to HTML/XML:
 Compare to JSON *(note - TML is NOT meant to replace JSON; this is only a syntax example)*:
     
     {
-        "firstName": "John",
-        "lastName": "Smith",
+        "first name": "John",
+        "last name": "Smith",
         "age": 25,
         "address": {
-            "streetAddress": "21 2nd Street",
+            "street address": "21 2nd Street",
             "city": "New York",
             "state": "NY",
             "postalCode": 10021
         }
     }
 
+
 ### TML example describing a 3D pyramid object for OpenGL:
 
-This example shows how one might use TML to load/store 3D models for an OpenGL graphics application. TML enables concise lists of vertex coordinates and element indexes, making this very natural to read, write, and organize.
+This example shows how one might use TML to load/store 3D models for an OpenGL graphics application. In addition to natural key-value pair syntax, TML enables concise lists of vertex coordinates and element indexes, making this very natural to read, write, and organize.
 
     [opengl model |
         [mode | indexed triangles]
@@ -75,6 +76,7 @@ This example shows how one might use TML to load/store 3D models for an OpenGL g
         [program fragment | media/rocky.frag]
         [program vertex | media/rocky.vert]
     ]
+
 
 ### TML example excerpt from a converted SVG image file:
 

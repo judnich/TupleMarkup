@@ -38,34 +38,65 @@ Compare to HTML/XML:
 ### TML example demonstrating key-value pair semantics:
 
     [
-    	[firstName | John]
-    	[lastName | Smith]
-    	[age | 25]
-    	[address |
-    		[streetAddress | 21 2nd Street]
-    		[city | New York]
-    		[state | NY]
-    		[postalCode | 10021]
-    	]
+        [first name | John]
+        [last name | Smith]
+        [age | 25]
+        [address |
+            [street address | 21 2nd Street]
+            [city | New York]
+            [state | NY]
+            [postalCode | 10021]
+        ]
     ]
 
 Compare to JSON *(note - TML is NOT meant to replace JSON; this is only a syntax example)*:
     
     {
-        "firstName": "John",
-        "lastName": "Smith",
+        "first name": "John",
+        "last name": "Smith",
         "age": 25,
         "address": {
-            "streetAddress": "21 2nd Street",
+            "street address": "21 2nd Street",
             "city": "New York",
             "state": "NY",
             "postalCode": 10021
         }
     }
     
+
+### TML example describing a 3D pyramid object for OpenGL:
+
+This example shows how one might use TML to load/store 3D models for an OpenGL graphics application. In addition to natural key-value pair syntax, TML enables concise lists of vertex coordinates and element indexes, making this very natural to read, write, and organize.
+
+    [opengl model |
+        [mode | indexed triangles]
+
+        [buffer vertex |
+            [attrib position | [layout interleaved] [type float3]]
+            [attrib uv | [layout interleaved] [type float2]]
+
+            [data position | [0 1 0] [-1 0 -1] [1 0 -1] [-1 0 1] [1 0 1]]
+            [data uv | [0.5 0.0] [0 1] [1 1] [0 1] [1 1]]
+        ]
+
+        [buffer element16 |
+            [data | 0 1 2  0 2 3  0 3 4  0 4 1 ]
+        ]
+
+        [texture 0 |
+            [file | media/rock.png]
+            [filter min | nearest]
+            [filter mag | bilinear]
+        ]
+
+        [program fragment | media/rocky.frag]
+        [program vertex | media/rocky.vert]
+    ]
+
+
 ### Curious to see more?
 
-The [examples](https://github.com/judnich/TupleMarkup/blob/master/EXAMPLES.md) file contains more complex examples.
+The [examples](https://github.com/judnich/TupleMarkup/blob/master/EXAMPLES.md) file contains some additional examples.
 
 
 ## TML Syntax
