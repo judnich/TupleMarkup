@@ -49,7 +49,7 @@ Compare to HTML/XML:
     	]
     ]
 
-Compare to JSON:
+Compare to JSON *(note - TML is NOT meant to replace JSON; this is only a syntax example)*:
     
     {
         "firstName": "John",
@@ -62,6 +62,10 @@ Compare to JSON:
             "postalCode": 10021
         }
     }
+    
+### Curious to see more?
+
+The [examples](https://github.com/judnich/TupleMarkup/blob/master/EXAMPLES.md) file contains more complex examples.
 
 
 ## TML Syntax
@@ -109,7 +113,7 @@ The last two, `\?` and `\*`, are escape codes meant to be used as wildcard token
 
 ### Done.
 
-That's it! You now know all of TML. Take a look at the examples if you haven't already to see how it looks in use.
+That's it! You now know all of TML. Take a look at more [examples](https://github.com/judnich/TupleMarkup/blob/master/EXAMPLES.md) (if you haven't already) to see how it looks in use.
 
 
 ## License
