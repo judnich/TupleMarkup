@@ -83,6 +83,13 @@ public:
 		return TmlNode( tml_child_at_index(&node, childIndex) );
 	}
 
+	// Same as getChildAtIndex().
+	// WARNING: This runs in O(n) time where n is the number of child nodes.
+	TmlNode operator[] (int childIndex) const
+	{
+		return TmlNode( tml_child_at_index(&node, childIndex) );
+	}
+
 	std::string toString() const
 	{
 		char buff[MAX_TML_STRING_SIZE];

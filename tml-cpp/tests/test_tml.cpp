@@ -14,15 +14,14 @@ int main(void)
 	string str = "[ [color|red] [position | 0.1 9.8 2.55] ]";
 	cout << "Parsing \"" << str << "\"..." << endl;
 
+	float vec[3];
+
 	TmlDoc *doc = TmlDoc::parseString(str);
 	TmlNode root = doc->getRoot();
 
 	TmlNode positionNode = root.findFirstChild("[position | \\? \\? \\?]"); // returns [position | 0.1 9.8 2.55]
-	string nodeName = positionNode.getChildAtIndex(0).toString(); // returns "position"
-
-	TmlNode posData = positionNode.getChildAtIndex(1); // returns [0.1 9.8 2.55]
-
-	float vec[3];
+	string nodeName = positionNode[0].toString(); // returns "position"
+	TmlNode posData = positionNode[1]; // returns TML list: [0.1 9.8 2.55]
 	posData.toFloatArray(vec, 3);
 
 	cout << "The parsed \"" << nodeName << "\" is (x=" << vec[0] << ", y=" << vec[1] << ", z=" << vec[2] << ")." << endl;
