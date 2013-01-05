@@ -123,7 +123,7 @@ is equivalent to:
 
     [ [position] [1 2 3] ]
 
-Empty tuples will also be generated with the `|` delimiter if you delimit nothingness: `[ | ]` is equivalent to `[ [] [] ]`. 
+You can use `|` multiple times; for example `[a|b|c]` is equivalent to `[[a][b][c]]`. Empty tuples will also be generated with the `|` delimiter if you delimit nothingness: `[ | ]` is equivalent to `[ [] [] ]`. 
 
 
 ### Comments
