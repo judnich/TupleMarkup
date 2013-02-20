@@ -148,17 +148,17 @@ struct tml_node tml_child_at_index(const struct tml_node *node, int child_index)
 
 /* --------------- UTILITY FUNCTIONS (CONVERSION) -------------------- */
 
-/* Converts the contents of this node into a string, minus TML notation. For example if
- * the node represents the subtree "[a [b [c]] d]", the result will be "a b c d".
+/* Converts the contents of this node into a string, with TML syntax stripped out. For example
+ * if the node represents the subtree "[a [b [c]] d]", the result will be "a b c d".
  * Returns the length of the resulting string. */
 size_t tml_node_to_string(const struct tml_node *node, char *dest_str, size_t dest_str_size);
 
-/* Converts the contents of this node into a string, minus TML notation. For example if
- * the node represents the subtree "[a [b [c]] d]", the result will be "[a [b [c]] d]".
+/* Converts the contents of this node into a string, with auto-formatted TML syntax included.
+ * For example if the node represents the subtree "[a [b [c]] d]", the result will be "[a [b [c]] d]".
  * Returns the length of the resulting string. */
 size_t tml_node_to_markup_string(const struct tml_node *node, char *dest_str, size_t dest_str_size);
 
-/* Converts the value of this node into an double value. */
+/* Converts the value of this node into a float value. */
 float tml_node_to_float(const struct tml_node *node);
 
 /* Converts the value of this node into an double value */
@@ -193,7 +193,7 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
  * include wildcards. There are two types of wildcards, written as "\*" and "\?" in TML.
  * 
  * The \? wildcard represents any single node - either a list item or a leaf item.
- * The \* wildcard represents zero or more nodes, i.e. it matches anything.
+ * The \* wildcard represents zero or more nodes, i.e. it matches anything up to the end of a list.
  * 
  * Simple examples:
  *
@@ -211,7 +211,7 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
  * Nested list patterns:
  * 
  * Keep in mind that each matched node can be lists too, so for example:
- * [\?] matches [[a b c]], because the \? wildcard matches the single nested list.
+ * [\?] matches [ [a b c] ], because the \? wildcard matches the single nested list.
  *
  * Your patterns can be nested as deeply as you like, and can contain non-wildcard items of 
  * course to match against. For example, say we want to match TML code like
@@ -234,9 +234,9 @@ int tml_node_to_int_array(const struct tml_node *node, int *array, int array_siz
 bool tml_compare_nodes(const struct tml_node *candidate, const struct tml_node *pattern);
 
 /* Finds the first child under this node that matches the given pattern, if any.
- * For example searching [1 2 [a 3] [a 4] 5] for the pattern [a \?] will return a node
- * pointing to the [a 3] node, because it's the first child that matches [c \?]. Then,
- * if you want to iterate to the next one "[a 4]", use tml_find_next_sibling.
+ * For example searching [1 2 [a 3] 4 [a 5] 6] for the pattern [a \?] will return a node
+ * pointing to the [a 3] node, because it's the first child that matches [a \?]. Then,
+ * if you want to iterate to the next one "[a 5]", use tml_find_next_sibling.
  * See tml_compare_nodes() for more info on how pattern matching works. */
 struct tml_node tml_find_first_child(const struct tml_node *node, const struct tml_node *pattern);
 
