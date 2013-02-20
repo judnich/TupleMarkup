@@ -184,18 +184,15 @@ void parse_word_item(struct tml_stream *stream, struct tml_token *token)
 	 * This does improve performance by a noticeable amount. */
 	#define CONDITION (ch != ' ' && ch != '\t' && ch != TML_ESCAPE_CHAR &&\
 			ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
-	#define LOOPBODY if (CONDITION) { ++p; ch = *p; } else { break; }
+	#define NEXT_CHAR ++p; ch = *p;
+	#define COND_NEXT_CHAR if (CONDITION) { NEXT_CHAR } else { break; }
 	char ch = *p;
-	while ((p < data_end-8) && CONDITION)
-	{
-		++p; ch = *p;
-		LOOPBODY LOOPBODY LOOPBODY
-		LOOPBODY LOOPBODY LOOPBODY LOOPBODY
+	while ((p < data_end-8) && CONDITION) {
+		NEXT_CHAR  COND_NEXT_CHAR  COND_NEXT_CHAR  COND_NEXT_CHAR
+		COND_NEXT_CHAR  COND_NEXT_CHAR  COND_NEXT_CHAR  COND_NEXT_CHAR
 	}
-	while ((p < data_end) && ch != ' ' && ch != '\t' && ch != TML_ESCAPE_CHAR &&
-		ch != TML_DIVIDER_CHAR && ch != TML_OPEN_CHAR && ch != TML_CLOSE_CHAR)
-	{
-		++p; ch = *p;
+	while ((p < data_end) && CONDITION) {
+		NEXT_CHAR
 	}
 
 	/* if encountered an escape code, cancel this function's work, and use another more complex (slower) function */
