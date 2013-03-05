@@ -12,12 +12,12 @@ What's in this folder?
 
 	This folder contains a TML parser API in Python.
 
-	Parsing TML data in Python is as simple as passing a TML string to tml.parse(), 
-	which returns the parsed data object.
+	Parsing TML data in Python is as simple as passing a TML string to
+	tml.parse(), which returns the parsed data object.
 
-	Just as TML consists of nested lists and strings, the object tml.parse() returns 
-	will consist of nested Python lists and strings. For example, parsing the TML
-	string "[abc 123 [hello] xyz]" returns an object equivalent to the Python
-	literal: "['abc', '123', ['hello'], 'xyz']". Despite TML's name, this parser
-	doesn't return data as nested *tuples* mainly because there's no reason
-	to make the data immutable (and Python tuples are immutable).
+	Just as TML consists of nested lists and strings, the object tml.parse() 
+	returns will consist of nested lists and strings. For example, parsing the
+	TML  string "[abc 123 [hello] xyz]" returns an object equivalent to the
+	Python literal: "['abc', '123', ['hello'], 'xyz']". Despite TML's name,
+	this parser doesn't return data as nested *tuples* mainly because there's 
+	no reason to make the data immutable (and Python tuples are immutable).
