@@ -15,6 +15,11 @@ What's in this folder?
 	Parsing TML data in Python is as simple as passing a TML string to
 	tml.parse(), which returns the parsed data object.
 
+	It may be interesting to note that all of TML (parser and related
+	pattern matching features) is implemented in less than *120* lines
+	of Python code (minus documentation strings). This demonstrates both
+	the simplicity of TML, and the expressiveness of Python.
+
 	Just as TML consists of nested lists and strings, the object tml.parse() 
 	returns will consist of nested lists and strings. For example, parsing the
 	TML  string "[abc 123 [hello] xyz]" returns an object equivalent to the

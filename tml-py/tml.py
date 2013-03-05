@@ -67,7 +67,8 @@ def _parseRoot(tokIter):
 	try:
 		tok = tokIter.next()
 		if tok != "[": raise RuntimeError("TML: Expected open bracket")
-	except StopIteration: raise RuntimeError("TML: Expected open bracket (empty TML text)")
+	except StopIteration:
+        raise RuntimeError("TML: Expected open bracket (empty TML text)")
 
 	tree, _ = _parseList(tokIter, False)
 
@@ -126,7 +127,7 @@ def compare(candidate, pattern):
     return True
 
 
-def find(node, pattern):
+def findFirst(node, pattern):
     """Returns the first child under node which matches the given pattern (by tml.compare).
     
     Returns null if no match is found. NOTE: Both "node" and "pattern" are expected to be
