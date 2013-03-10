@@ -1,6 +1,6 @@
 ## Tuple Markup Language
 
-An extremely simple all-purpose markup language: nested lists with bracket-minimizing syntax.
+A minimalist all-purpose markup language: nested lists with bracket-minimizing syntax.
 
 ### Why TML?
 
